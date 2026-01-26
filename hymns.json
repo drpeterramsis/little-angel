@@ -1,0 +1,44 @@
+[
+  {
+    "id": "1",
+    "title": "إليك أرفع صلاتي - Unto You I Lift Up",
+    "category": "صلاة - Prayer",
+    "lyrics": [
+      "إليك أرفع صلاتي",
+      "Unto You I lift up my prayer",
+      "يا من يسمع الدعاء",
+      "O You who hears supplications",
+      "",
+      "استمع لصرختي يا ربي",
+      "Hear my cry, O my Lord",
+      "وارحمني برحمتك",
+      "And have mercy on me with Your mercy"
+    ]
+  },
+  {
+    "id": "2",
+    "title": "Little Angel Theme",
+    "category": "كورال - Choral",
+    "lyrics": [
+      "نحن الملاك الصغير",
+      "We are the Little Angel",
+      "نرنم للرب القدير",
+      "Singing to the Almighty Lord",
+      "بقلوب صافية ونقية",
+      "With pure and clear hearts",
+      "Like a morning dove",
+      "مثل حمامة الصباح"
+    ]
+  },
+  {
+    "id": "3",
+    "title": "Mixed Line Test (Example)",
+    "category": "Test",
+    "lyrics": [
+      "هذا سطر عربي This is Arabic line",
+      "This is English line هذا سطر إنجليزي",
+      "Mixed (مختلط) Text",
+      "اللغة العربية (Arabic Language)"
+    ]
+  }
+]

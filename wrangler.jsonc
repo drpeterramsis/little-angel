@@ -1,7 +1,16 @@
+<<<<<<< HEAD
 {
   "name": "little-angel-choir",
   "compatibility_date": "2026-01-26",
   "assets": {
     "directory": "./dist"
   }
+=======
+{
+  "name": "little-angel-choir",
+  "compatibility_date": "2026-01-26",
+  "assets": {
+    "directory": "./dist"
+  }
+>>>>>>> 1985214de70addd100e0186d67cd0b86cab498b6
 }

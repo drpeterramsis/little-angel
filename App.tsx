@@ -2,20 +2,23 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Header } from './components/Header';
 import { HymnList } from './components/HymnList';
 import { HymnDetail } from './components/HymnDetail';
+import { IntroPage } from './components/IntroPage';
 import { Hymn } from './types';
 import { HYMNS } from './data';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
   
   // Lifted state
   const [searchTerm, setSearchTerm] = useState('');
   const [currentHymn, setCurrentHymn] = useState<Hymn | null>(null);
 
-  // Initialize Dark Mode
+  // Initialize Dark Mode - Force Light Mode by default unless explicitly set to dark
   useEffect(() => {
-    const isDark = localStorage.getItem('theme') === 'dark' || 
-      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    // Check local storage only. Ignore window.matchMedia to force light mode default.
+    const savedTheme = localStorage.getItem('theme');
+    const isDark = savedTheme === 'dark';
     
     setDarkMode(isDark);
     if (isDark) {
@@ -37,6 +40,10 @@ function App() {
       }
       return newMode;
     });
+  };
+
+  const handleEnterApp = () => {
+    setShowIntro(false);
   };
 
   // Filter logic for the LIST view
@@ -63,7 +70,6 @@ function App() {
 
   const handleBack = () => {
     setCurrentHymn(null);
-    // Search term is preserved so list remains filtered
   };
 
   const handleNextHymn = () => {
@@ -80,8 +86,14 @@ function App() {
     }
   };
 
+  if (showIntro) {
+    return <IntroPage onEnter={handleEnterApp} />;
+  }
+
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300 font-sans">
+    // Note: The main background is set in index.html (bg-gold-gradient)
+    // We use transparent/semi-transparent backgrounds here to let it shine through
+    <div className="min-h-screen font-sans">
       <Header 
         darkMode={darkMode} 
         toggleDarkMode={toggleDarkMode} 

@@ -138,10 +138,11 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   }, [localSearch, lines]);
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-80px)] bg-zinc-50 dark:bg-zinc-950 pb-20">
+    // Removed bg-zinc-50 to allow global gradient to show through
+    <div className="flex flex-col min-h-[calc(100vh-80px)] pb-20">
       
       {/* Detail Header / Nav */}
-      <div className="sticky top-[73px] z-30 bg-zinc-50/95 dark:bg-zinc-950/95 backdrop-blur border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 shadow-sm">
+      <div className="sticky top-[73px] z-30 bg-white/90 dark:bg-zinc-950/90 backdrop-blur border-b border-white/20 dark:border-zinc-800 px-4 py-3 shadow-sm">
         <div className="max-w-3xl mx-auto flex flex-col gap-3">
           
           {/* Top Row: Back, Title, Font Controls */}
@@ -149,7 +150,7 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
             <div className="flex items-center gap-3 overflow-hidden">
               <button 
                 onClick={onBack}
-                className="p-2 -ml-2 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors flex-shrink-0"
+                className="p-2 -ml-2 rounded-full hover:bg-black/5 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors flex-shrink-0"
               >
                 <ArrowRight size={24} />
               </button>
@@ -157,11 +158,11 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
             </div>
             
             {/* Font Controls */}
-            <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg p-1">
+            <div className="flex items-center gap-1 bg-zinc-100/80 dark:bg-zinc-800 rounded-lg p-1">
               <button 
                 onClick={() => updateFontSize(fontSize - 2)}
                 className="p-1.5 hover:bg-white dark:hover:bg-zinc-700 rounded-md text-zinc-600 dark:text-zinc-300 transition-colors"
-                aria-label="Decrease Font Size"
+                aria-label="تصغير الخط"
               >
                 <Minus size={16} />
               </button>
@@ -169,7 +170,7 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
               <button 
                 onClick={() => updateFontSize(fontSize + 2)}
                 className="p-1.5 hover:bg-white dark:hover:bg-zinc-700 rounded-md text-zinc-600 dark:text-zinc-300 transition-colors"
-                aria-label="Increase Font Size"
+                aria-label="تكبير الخط"
               >
                 <Plus size={16} />
               </button>
@@ -184,7 +185,7 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
                 value={localSearch}
                 onChange={handleSearchChange}
                 placeholder="بحث داخل الكلمات..."
-                className="w-full pl-4 pr-10 py-2 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-300 dark:border-zinc-700 focus:border-primary outline-none text-sm dark:text-white"
+                className="w-full pl-4 pr-10 py-2 bg-white/80 dark:bg-zinc-900 rounded-lg border border-zinc-300 dark:border-zinc-700 focus:border-primary outline-none text-sm dark:text-white"
               />
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
             </div>
@@ -196,13 +197,13 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
               </span>
               <button 
                 onClick={() => handleNavigation(currentMatchIndex - 1)}
-                className="p-2 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 shadow-sm"
+                className="p-2 bg-white/80 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 shadow-sm"
               >
                 <ChevronUp size={16} />
               </button>
               <button 
                 onClick={() => handleNavigation(currentMatchIndex + 1)}
-                className="p-2 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 shadow-sm"
+                className="p-2 bg-white/80 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 shadow-sm"
               >
                 <ChevronDown size={16} />
               </button>
@@ -227,7 +228,7 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
       </div>
 
       {/* Sticky Bottom Navigation for Hymns */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/95 dark:bg-zinc-950/95 backdrop-blur border-t border-zinc-200 dark:border-zinc-800 z-50">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-zinc-950/90 backdrop-blur border-t border-zinc-200 dark:border-zinc-800 z-50">
          <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
             <button
               onClick={onPrev}

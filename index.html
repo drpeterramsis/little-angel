@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Little Angel Choir</title>
+    <title>كورال الملاك الصغير</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,6 +29,18 @@
       html {
         scroll-behavior: smooth;
       }
+      
+      /* Master Background Gradient - Gold */
+      .bg-gold-gradient {
+        background: linear-gradient(180deg, #fffce8 0%, #eebc3f 100%);
+        background-attachment: fixed; /* Keeps gradient fixed while scrolling */
+      }
+
+      /* Dark mode fallback or alternative */
+      .dark .bg-gold-gradient {
+        background: linear-gradient(180deg, #18181b 0%, #27272a 100%);
+      }
+
       /* Custom highlight fade transition */
       .highlight-mark {
         background-color: transparent;
@@ -48,6 +60,15 @@
         background-color: #d97706; /* Amber-600 */
         color: #fff;
       }
+
+      /* Animation for intro */
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in {
+        animation: fadeIn 0.8s ease-out forwards;
+      }
     </style>
   <script type="importmap">
 {
@@ -61,7 +82,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 transition-colors duration-300 min-h-screen">
+  <body class="bg-gold-gradient text-zinc-900 dark:text-zinc-100 transition-colors duration-300 min-h-screen">
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>

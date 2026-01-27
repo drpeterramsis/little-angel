@@ -19,7 +19,7 @@ export const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode, onLogo
         >
           <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20 bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
              <img 
-              src="./logo.webp" 
+              src="logo.webp" 
               alt="شعار الملاك الصغير" 
               className="w-full h-full object-cover"
               onError={(e) => {

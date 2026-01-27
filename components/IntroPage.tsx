@@ -13,7 +13,7 @@ export const IntroPage: React.FC<IntroPageProps> = ({ onEnter }) => {
           <div className="w-40 h-40 rounded-full bg-white dark:bg-zinc-800 shadow-2xl flex items-center justify-center mb-2 animate-bounce-slow overflow-hidden">
              {/* Main Logo */}
              <img 
-               src="./logo.webp"
+               src="logo.webp"
                alt="شعار كورال الملاك الصغير" 
                className="w-full h-full object-cover"
              />

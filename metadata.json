@@ -1,5 +1,5 @@
 {
-  "name": "Little Angel Choir",
-  "description": "A modern, bilingual (Arabic/English) hymn book web application featuring dark mode, instant search, and adjustable typography. Built for the Little Angel Choral.",
+  "name": "final Little Angel Choir",
+  "description": "A bilingual church choir application for managing and viewing hymns with advanced search and accessibility features.",
   "requestFramePermissions": []
 }

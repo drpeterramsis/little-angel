@@ -3,50 +3,65 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Little Angel - الملاك الصغير</title>
-    <!-- Tailwind CSS with custom configuration -->
+    <title>Little Angel Choir</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <script>
-      // Configure Tailwind to use 'class' strategy for dark mode
-      // This ensures the theme is controlled by the app's toggle, not the OS preference
       tailwind.config = {
         darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Tajawal', 'sans-serif'], // Custom font family
+              sans: ['Cairo', 'sans-serif'],
+            },
+            colors: {
+              primary: '#3b82f6',
+              secondary: '#fbbf24',
             }
           }
         }
       }
     </script>
-    <!-- Google Fonts: Tajawal for a clean, readable Arabic/English look -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-      body {
-        font-family: 'Tajawal', sans-serif;
+      /* Smooth scrolling for the whole page */
+      html {
+        scroll-behavior: smooth;
       }
-      /* Custom utility for bidi text isolation */
-      .bidi-isolate {
-        unicode-bidi: plaintext;
-        text-align: center;
+      /* Custom highlight fade transition */
+      .highlight-mark {
+        background-color: transparent;
+        color: inherit;
+        transition: background-color 0.5s ease-out, color 0.5s ease-out;
+        border-radius: 4px;
+        padding: 0 2px;
+      }
+      
+      .highlight-active {
+        background-color: #fbbf24; /* Amber-400 */
+        color: #000;
+      }
+      
+      /* Dark mode adjustment for highlight */
+      .dark .highlight-active {
+        background-color: #d97706; /* Amber-600 */
+        color: #fff;
       }
     </style>
   <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0"
   }
 }
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <!-- Added dark mode classes to body for full coverage -->
-  <body class="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300">
+  <body class="bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 transition-colors duration-300 min-h-screen">
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>

@@ -1,11 +1,10 @@
 export interface Hymn {
-  id: string;
+  id: number;
   title: string;
-  category?: string;
-  lyrics: string[];
+  lyrics: string;
 }
 
-export interface AppState {
-  view: 'list' | 'reader';
-  activeHymnId: string | null;
+export interface SearchState {
+  term: string;
+  triggerHighlight: boolean;
 }

@@ -23,8 +23,8 @@ export const IntroPage: React.FC<IntroPageProps> = ({ onEnter }) => {
             <h1 className="text-5xl font-black text-zinc-900 dark:text-white drop-shadow-sm font-sans tracking-tight">
               الملاك الصغير
             </h1>
-            <p className="text-2xl font-light text-zinc-800 dark:text-zinc-200">
-              خدمة الكورال
+            <p className="text-2xl font-bold text-primary dark:text-secondary">
+              حفل نغمة أجيال
             </p>
           </div>
           

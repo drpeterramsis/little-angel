@@ -29,7 +29,7 @@ export const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode, onLogo
           </div>
           
           <div className="flex flex-col items-start -space-y-1">
-            <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white font-sans">الملاك الصغير</h1>
+            <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white font-sans">Little angel</h1>
             <span className="text-xs font-bold text-primary dark:text-secondary">حفل نغمة أجيال</span>
           </div>
         </div>

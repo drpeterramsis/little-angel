@@ -1,4 +1,4 @@
-import { Hymn } from './types';
+import { Hymn, ChoirMember } from './types';
 
 export const HYMNS: Hymn[] = [
   {
@@ -68,4 +68,19 @@ God in three Persons, blessed Trinity!`
 ربي يسوع .. ربي يسوع
 أمانك ملاني يا ربي يسوع`
   }
+];
+
+export const CHOIR_MEMBERS: ChoirMember[] = [
+  { id: 1, name: "مينا مجدي", role: "قائد الكورال" },
+  { id: 2, name: "كيرلس سامي", role: "عازف بيانو" },
+  { id: 3, name: "بيتر نبيل", role: "عازف جيتار" },
+  { id: 4, name: "مارينا عادل", role: "سوبرانو" },
+  { id: 5, name: "جوجو", role: "ألتو" },
+  { id: 6, name: "ديفيد", role: "تينور" },
+  { id: 7, name: "مايكل", role: "باص" },
+  { id: 8, name: "ساندرا", role: "مرنمة" },
+  { id: 9, name: "توماس", role: "مرنم" },
+  { id: 10, name: "جولي", role: "مرنمة" },
+  { id: 11, name: "فادي", role: "إيقاع" },
+  { id: 12, name: "مارك", role: "هندسة صوتية" }
 ];

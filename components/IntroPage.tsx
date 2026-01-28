@@ -21,7 +21,7 @@ export const IntroPage: React.FC<IntroPageProps> = ({ onEnter }) => {
           
           <div className="space-y-2">
             <h1 className="text-5xl font-black text-zinc-900 dark:text-white drop-shadow-sm font-sans tracking-tight">
-              الملاك الصغير
+             Little angel
             </h1>
             <p className="text-2xl font-bold text-primary dark:text-secondary">
               حفل نغمة أجيال
@@ -46,7 +46,7 @@ export const IntroPage: React.FC<IntroPageProps> = ({ onEnter }) => {
        </div>
        
        <div className="absolute bottom-6 text-sm text-zinc-600 dark:text-zinc-400 font-medium opacity-60">
-         v1.0.1 • كورال الملاك الصغير
+         v1.0.4 • كورال الملاك الصغير
        </div>
     </div>
   );

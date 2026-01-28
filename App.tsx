@@ -5,6 +5,7 @@ import { HymnDetail } from './components/HymnDetail';
 import { IntroPage } from './components/IntroPage';
 import { MenuPage } from './components/MenuPage';
 import { ChoirMembers } from './components/ChoirMembers';
+import { ScrollToTop } from './components/ScrollToTop';
 import { Hymn } from './types';
 import { HYMNS } from './data';
 
@@ -168,7 +169,7 @@ function App() {
           <HymnDetail 
             key={currentHymn.id}
             hymn={currentHymn} 
-            initialSearchTerm={searchTerm}
+            // Removed initialSearchTerm={searchTerm}
             onBack={handleBack}
             onNext={handleNextHymn}
             onPrev={handlePrevHymn}
@@ -200,6 +201,8 @@ function App() {
       <main>
         {renderContent()}
       </main>
+
+      <ScrollToTop />
     </div>
   );
 }

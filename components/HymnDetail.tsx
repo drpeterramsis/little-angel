@@ -4,7 +4,7 @@ import { Hymn } from '../types';
 
 interface HymnDetailProps {
   hymn: Hymn;
-  initialSearchTerm: string;
+  // Removed initialSearchTerm prop to prevent pre-filling the search
   onBack: () => void;
   onNext: () => void;
   onPrev: () => void;
@@ -14,14 +14,14 @@ interface HymnDetailProps {
 
 export const HymnDetail: React.FC<HymnDetailProps> = ({ 
   hymn, 
-  initialSearchTerm, 
   onBack,
   onNext,
   onPrev,
   canNext,
   canPrev
 }) => {
-  const [localSearch, setLocalSearch] = useState(initialSearchTerm);
+  // Initialize with empty string so search is cleared when entering
+  const [localSearch, setLocalSearch] = useState('');
   const [matchCount, setMatchCount] = useState(0);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(-1);
   const [fontSize, setFontSize] = useState(24); // Default 24px
@@ -185,9 +185,13 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
                 value={localSearch}
                 onChange={handleSearchChange}
                 placeholder="بحث داخل الكلمات..."
-                className="w-full pl-4 pr-10 py-2 bg-white/80 dark:bg-zinc-900 rounded-lg border border-zinc-300 dark:border-zinc-700 focus:border-primary outline-none text-sm dark:text-white"
+                // Styling Update: 
+                // - pl-10: Padding Left to make room for icon
+                // - pr-4: Padding Right for text start
+                className="w-full pl-10 pr-4 py-2 bg-white/80 dark:bg-zinc-900 rounded-lg border border-zinc-300 dark:border-zinc-700 focus:border-primary outline-none text-sm dark:text-white"
               />
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
+              {/* Icon moved to left-3 */}
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
             </div>
             
             {/* Search Navigation Buttons */}

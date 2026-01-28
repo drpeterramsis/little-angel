@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 
 interface IntroPageProps {
@@ -6,48 +6,98 @@ interface IntroPageProps {
 }
 
 export const IntroPage: React.FC<IntroPageProps> = ({ onEnter }) => {
+  // Animation Stages:
+  // 0: Initial (Logo Visible, BG Blurred)
+  // 1: Transition (Logo Fades Out, BG Unblurs)
+  // 2: Final (Bottom UI Reveal)
+  const [stage, setStage] = useState(0);
+
+  useEffect(() => {
+    // Sequence Timers
+    const t1 = setTimeout(() => setStage(1), 2500); // Wait 2.5s before clearing blur
+    const t2 = setTimeout(() => setStage(2), 3500); // 1s after blur clears, show UI
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center animate-fade-in">
-       
-       <div className="flex flex-col items-center gap-8 max-w-lg w-full bg-white/20 dark:bg-black/20 backdrop-blur-md p-10 rounded-3xl shadow-xl border border-white/30 dark:border-white/10">
-          <div className="w-40 h-40 rounded-full bg-white dark:bg-zinc-800 shadow-2xl flex items-center justify-center mb-2 animate-bounce-slow overflow-hidden">
-             {/* Main Logo */}
-             <img 
-               src="logo.webp"
-               alt="شعار كورال الملاك الصغير" 
-               className="w-full h-full object-cover"
-             />
-          </div>
-          
-          <div className="space-y-2">
-            <h1 className="text-5xl font-black text-zinc-900 dark:text-white drop-shadow-sm font-sans tracking-tight">
-             Little angel
-            </h1>
-            <p className="text-2xl font-bold text-primary dark:text-secondary">
-              حفل نغمة أجيال
-            </p>
-          </div>
-          
-          <div className="h-1 w-20 bg-zinc-900/10 dark:bg-white/20 rounded-full"></div>
+    <div className="fixed inset-0 z-50 overflow-hidden bg-black font-sans">
+      
+      {/* 1. Background Poster Image */}
+      <div className="absolute inset-0 z-0">
+        <div 
+          className={`w-full h-full transition-all duration-[1500ms] ease-in-out transform ${
+            stage === 0 ? 'scale-110 blur-xl' : 'scale-100 blur-0'
+          }`}
+        >
+          {/* Note: Ensure 'poster.webp' is in the root folder */}
+          <img 
+            src="poster.webp" 
+            alt="Event Poster" 
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.parentElement!.style.backgroundColor = '#333';
+            }}
+          />
+        </div>
+      </div>
 
-          <p className="text-lg text-zinc-800/90 dark:text-zinc-200/90 leading-relaxed font-medium">
-            أهلاً بكم في تطبيق كورال الملاك الصغير
-            <br/>
-            مجموعة من الترانيم والألحان الروحية
-          </p>
+      {/* 2. Center Chorale Logo (Initial State) */}
+      <div 
+        className={`absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-1000 ease-out ${
+          stage === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-full flex items-center justify-center drop-shadow-2xl animate-fade-in">
+           {/* Note: Uses existing logo.webp */}
+           <img 
+             src="logo.webp" 
+             alt="Little Angel Logo" 
+             className="w-full h-full object-contain" 
+           />
+        </div>
+      </div>
 
-          <button 
-            onClick={onEnter}
-            className="w-full mt-4 group relative px-8 py-4 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-2xl font-bold text-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3"
-          >
-            <span>دخول التطبيق</span>
-            <ArrowLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
-          </button>
-       </div>
-       
-       <div className="absolute bottom-6 text-sm text-zinc-600 dark:text-zinc-400 font-medium opacity-60">
-         v1.0.4 • كورال الملاك الصغير
-       </div>
+      {/* 3. Bottom UI Overlay (Final State) */}
+      <div 
+        className={`absolute bottom-0 left-0 right-0 z-20 flex flex-col items-center justify-end pb-8 pt-32 px-6 bg-gradient-to-t from-white via-white/95 to-transparent transition-all duration-1000 transform ${
+          stage === 2 ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'
+        }`}
+      >
+         <div className="flex flex-col items-center gap-6 w-full max-w-md">
+            
+            {/* Naghamat Ajyal Logo */}
+            <div className="w-32 h-auto">
+              {/* Note: Ensure 'naghamat.webp' is in the root folder */}
+              <img 
+                src="naghamat.webp" 
+                alt="Naghamat Ajyal" 
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+
+            {/* Enter Button */}
+            <button 
+              onClick={onEnter}
+              className="w-full group relative px-8 py-4 bg-zinc-900 text-white rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl hover:bg-zinc-800 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3"
+            >
+              <span>دخول التطبيق</span>
+              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            </button>
+
+            {/* Version Number */}
+            <div className="text-[10px] text-zinc-400 font-medium">
+              v1.0.14
+            </div>
+         </div>
+      </div>
     </div>
   );
 };

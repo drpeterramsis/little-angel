@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowRight, Search, ChevronUp, ChevronDown, ChevronRight, ChevronLeft, Minus, Plus, Type } from 'lucide-react';
+import { Search, ChevronUp, ChevronDown, ChevronRight, ChevronLeft, Minus, Plus, Type } from 'lucide-react';
 import { Hymn } from '../types';
 
 interface HymnDetailProps {
   hymn: Hymn;
-  // Removed initialSearchTerm prop to prevent pre-filling the search
   onBack: () => void;
   onNext: () => void;
   onPrev: () => void;
@@ -138,24 +137,17 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   }, [localSearch, lines]);
 
   return (
-    // Removed bg-zinc-50 to allow global gradient to show through
-    <div className="flex flex-col min-h-[calc(100vh-80px)] pb-20">
+    // Increased padding-bottom to pb-48 to allow scrolling well past the sticky footer/buttons
+    <div className="flex flex-col min-h-[calc(100vh-80px)] pb-48">
       
       {/* Detail Header / Nav */}
       <div className="sticky top-[73px] z-30 bg-white/90 dark:bg-zinc-950/90 backdrop-blur border-b border-white/20 dark:border-zinc-800 px-4 py-3 shadow-sm">
         <div className="max-w-3xl mx-auto flex flex-col gap-3">
           
-          {/* Top Row: Back, Title, Font Controls */}
+          {/* Top Row: Title (No Back Button here) and Font Controls */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 overflow-hidden">
-              <button 
-                onClick={onBack}
-                className="p-2 -ml-2 rounded-full hover:bg-black/5 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors flex-shrink-0"
-              >
-                <ArrowRight size={24} />
-              </button>
-              <h2 className="text-xl font-bold truncate text-primary">{hymn.title}</h2>
-            </div>
+            {/* Title only */}
+            <h2 className="text-xl font-bold truncate text-primary">{hymn.title}</h2>
             
             {/* Font Controls */}
             <div className="flex items-center gap-1 bg-zinc-100/80 dark:bg-zinc-800 rounded-lg p-1">
@@ -178,19 +170,15 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
           </div>
 
           {/* Internal Search Bar */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full">
             <div className="relative flex-1">
               <input
                 type="text"
                 value={localSearch}
                 onChange={handleSearchChange}
                 placeholder="بحث داخل الكلمات..."
-                // Styling Update: 
-                // - pl-10: Padding Left to make room for icon
-                // - pr-4: Padding Right for text start
                 className="w-full pl-10 pr-4 py-2 bg-white/80 dark:bg-zinc-900 rounded-lg border border-zinc-300 dark:border-zinc-700 focus:border-primary outline-none text-sm dark:text-white"
               />
-              {/* Icon moved to left-3 */}
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
             </div>
             

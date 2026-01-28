@@ -145,6 +145,9 @@ function App() {
     }
   };
 
+  // Determine if we are currently looking at a single hymn detail page
+  const isDetailView = view === 'hymns' && currentHymn !== null;
+
   if (showIntro) {
     return <IntroPage onEnter={handleEnterApp} />;
   }
@@ -202,7 +205,7 @@ function App() {
         {renderContent()}
       </main>
 
-      <ScrollToTop />
+      <ScrollToTop hasBottomNav={isDetailView} />
     </div>
   );
 }

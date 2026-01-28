@@ -137,14 +137,14 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   }, [localSearch, lines]);
 
   return (
-    // Increased padding-bottom to pb-48 to allow scrolling well past the sticky footer/buttons
-    <div className="flex flex-col min-h-[calc(100vh-80px)] pb-48">
+    // Increased padding-bottom to pb-64 to allow scrolling well past the sticky footer/buttons
+    <div className="flex flex-col min-h-[calc(100vh-80px)] pb-64">
       
       {/* Detail Header / Nav */}
       <div className="sticky top-[73px] z-30 bg-white/90 dark:bg-zinc-950/90 backdrop-blur border-b border-white/20 dark:border-zinc-800 px-4 py-3 shadow-sm">
         <div className="max-w-3xl mx-auto flex flex-col gap-3">
           
-          {/* Top Row: Title (No Back Button here) and Font Controls */}
+          {/* Top Row: Title and Font Controls */}
           <div className="flex items-center justify-between">
             {/* Title only */}
             <h2 className="text-xl font-bold truncate text-primary">{hymn.title}</h2>
@@ -177,29 +177,31 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
                 value={localSearch}
                 onChange={handleSearchChange}
                 placeholder="بحث داخل الكلمات..."
-                className="w-full pl-10 pr-4 py-2 bg-white/80 dark:bg-zinc-900 rounded-lg border border-zinc-300 dark:border-zinc-700 focus:border-primary outline-none text-sm dark:text-white"
+                className="w-full pl-10 pr-4 py-2 bg-white/80 dark:bg-zinc-900 rounded-lg border border-zinc-300 dark:border-zinc-700 focus:border-primary outline-none text-sm dark:text-white transition-all"
               />
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
             </div>
             
-            {/* Search Navigation Buttons */}
-            <div className={`flex items-center gap-1 transition-opacity ${matchCount > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-              <span className="text-xs text-zinc-500 whitespace-nowrap mx-1 font-mono">
-                {matchCount > 0 ? `${currentMatchIndex + 1}/${matchCount}` : '0/0'}
-              </span>
-              <button 
-                onClick={() => handleNavigation(currentMatchIndex - 1)}
-                className="p-2 bg-white/80 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 shadow-sm"
-              >
-                <ChevronUp size={16} />
-              </button>
-              <button 
-                onClick={() => handleNavigation(currentMatchIndex + 1)}
-                className="p-2 bg-white/80 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 shadow-sm"
-              >
-                <ChevronDown size={16} />
-              </button>
-            </div>
+            {/* Search Navigation Buttons - Conditionally Rendered to save space when not in use */}
+            {matchCount > 0 && (
+              <div className="flex items-center gap-1 animate-fade-in">
+                <span className="text-xs text-zinc-500 whitespace-nowrap mx-1 font-mono">
+                  {`${currentMatchIndex + 1}/${matchCount}`}
+                </span>
+                <button 
+                  onClick={() => handleNavigation(currentMatchIndex - 1)}
+                  className="p-2 bg-white/80 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 shadow-sm"
+                >
+                  <ChevronUp size={16} />
+                </button>
+                <button 
+                  onClick={() => handleNavigation(currentMatchIndex + 1)}
+                  className="p-2 bg-white/80 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 shadow-sm"
+                >
+                  <ChevronDown size={16} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

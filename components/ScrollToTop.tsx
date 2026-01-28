@@ -32,8 +32,8 @@ export const ScrollToTop: React.FC<ScrollToTopProps> = ({ hasBottomNav = false }
 
   // Determine bottom position based on whether the sticky nav exists
   // bottom-6 (24px) for normal pages
-  // bottom-28 (112px) for Hymn Detail to clear the footer buttons
-  const positionClass = hasBottomNav ? 'bottom-28' : 'bottom-6';
+  // bottom-32 (128px) for Hymn Detail to clear the footer buttons (~80-90px height) safely
+  const positionClass = hasBottomNav ? 'bottom-32' : 'bottom-6';
 
   return (
     <button

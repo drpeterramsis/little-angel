@@ -14,22 +14,41 @@ export const HymnList: React.FC<HymnListProps> = ({ hymns, searchTerm, onSearchC
   const highlightText = (text: string, highlight: string) => {
     if (!highlight.trim()) return text;
     
-    // Split by the search term (case insensitive)
-    const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+    // Build flexible Arabic regex pattern
+    let pattern = '';
+    for (const char of highlight) {
+      if (['ا', 'أ', 'إ', 'آ'].includes(char)) {
+        pattern += '[اأإآ]';
+      } else if (['ي', 'ى'].includes(char)) {
+        pattern += '[يى]';
+      } else {
+        pattern += char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+    }
     
-    return (
-      <>
-        {parts.map((part, i) => 
-          part.toLowerCase() === highlight.toLowerCase() ? (
-            <span key={i} className="bg-yellow-200 dark:bg-yellow-700/50 text-black dark:text-white rounded px-1 box-decoration-clone">
-              {part}
-            </span>
-          ) : (
-            part
-          )
-        )}
-      </>
-    );
+    try {
+      // Create regex with capturing group for splitting
+      const regex = new RegExp(`(${pattern})`, 'gi');
+      const parts = text.split(regex);
+      
+      return (
+        <>
+          {parts.map((part, i) => 
+            // When splitting with capture group, odd indices are the matches
+            i % 2 === 1 ? (
+              <span key={i} className="bg-yellow-200 dark:bg-yellow-700/50 text-black dark:text-white rounded px-1 box-decoration-clone">
+                {part}
+              </span>
+            ) : (
+              part
+            )
+          )}
+        </>
+      );
+    } catch (e) {
+      // Fallback if regex fails
+      return text;
+    }
   };
 
   return (
@@ -75,13 +94,23 @@ export const HymnList: React.FC<HymnListProps> = ({ hymns, searchTerm, onSearchC
               </div>
               
               {/* Show snippet if lyrics matched */}
-              {searchTerm && hymn.lyrics.toLowerCase().includes(searchTerm.toLowerCase()) && (
+              {/* Use simple includes for quick check, but flexible regex for highlighting is handled inside the render */}
+              {searchTerm && (
+                 /* We need to check flexible match to decide if we show the snippet div */
+                 (function() {
+                    let pattern = '';
+                    for (const char of searchTerm) {
+                      if (['ا', 'أ', 'إ', 'آ'].includes(char)) pattern += '[اأإآ]';
+                      else if (['ي', 'ى'].includes(char)) pattern += '[يى]';
+                      else pattern += char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    }
+                    const regex = new RegExp(pattern, 'i');
+                    return regex.test(hymn.lyrics);
+                 })()
+              ) && (
                 <div className="mt-3 mr-14 text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">
                   {highlightText(
-                     hymn.lyrics.substring(
-                       Math.max(0, hymn.lyrics.toLowerCase().indexOf(searchTerm.toLowerCase()) - 20),
-                       Math.min(hymn.lyrics.length, hymn.lyrics.toLowerCase().indexOf(searchTerm.toLowerCase()) + 80)
-                     ) + "...", 
+                     hymn.lyrics,
                      searchTerm
                   )}
                 </div>

@@ -75,27 +75,47 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
     }
   }, [matchCount]);
 
+  // Helper to create flexible Arabic regex
+  const getFlexibleRegex = (term: string) => {
+    let pattern = '';
+    for (const char of term) {
+      if (['ا', 'أ', 'إ', 'آ'].includes(char)) {
+        pattern += '[اأإآ]';
+      } else if (['ي', 'ى'].includes(char)) {
+        pattern += '[يى]';
+      } else {
+        pattern += char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+    }
+    return new RegExp(pattern, 'gi');
+  };
+
   // Effect: Reset refs and calculate matches when search changes
   useEffect(() => {
     matchRefs.current = []; // Reset refs
     
-    const term = localSearch.trim().toLowerCase();
+    const term = localSearch.trim();
     if (!term) {
       setMatchCount(0);
       setCurrentMatchIndex(-1);
       return;
     }
 
-    const regex = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-    const matches = hymn.lyrics.match(regex);
-    const count = matches ? matches.length : 0;
-    
-    setMatchCount(count);
-    
-    if (count > 0) {
-      setTimeout(() => handleNavigation(0), 100);
-    } else {
-      setCurrentMatchIndex(-1);
+    try {
+      const regex = getFlexibleRegex(term);
+      const matches = hymn.lyrics.match(regex);
+      const count = matches ? matches.length : 0;
+      
+      setMatchCount(count);
+      
+      if (count > 0) {
+        setTimeout(() => handleNavigation(0), 100);
+      } else {
+        setCurrentMatchIndex(-1);
+      }
+    } catch(e) {
+      console.error(e);
+      setMatchCount(0);
     }
   }, [localSearch, hymn.lyrics, handleNavigation]);
 
@@ -106,25 +126,34 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
 
   // Helper to render text with highlighted spans that attach to refs
   const renderLineWithHighlights = (line: string) => {
-    if (!localSearch.trim()) return line;
+    const term = localSearch.trim();
+    if (!term) return line;
 
-    const term = localSearch.toLowerCase();
-    const parts = line.split(new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
-    
-    return parts.map((part, i) => {
-      if (part.toLowerCase() === term) {
-        return (
-          <span
-            key={i}
-            className="highlight-mark"
-            data-search-match="true"
-          >
-            {part}
-          </span>
-        );
-      }
-      return <span key={i}>{part}</span>;
-    });
+    try {
+      // Create regex with capturing group for splitting
+      const patternString = getFlexibleRegex(term).source;
+      const regex = new RegExp(`(${patternString})`, 'gi');
+      
+      const parts = line.split(regex);
+      
+      return parts.map((part, i) => {
+        // Since we split by capturing group, odd indices are matches
+        if (i % 2 === 1) {
+          return (
+            <span
+              key={i}
+              className="highlight-mark"
+              data-search-match="true"
+            >
+              {part}
+            </span>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      });
+    } catch (e) {
+      return line;
+    }
   };
 
   // More robust ref collection using querySelector after render

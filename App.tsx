@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Header } from './components/Header';
 import { HymnList } from './components/HymnList';
 import { HymnDetail } from './components/HymnDetail';
@@ -21,9 +21,8 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentHymn, setCurrentHymn] = useState<Hymn | null>(null);
 
-  // Initialize Dark Mode - Force Light Mode by default unless explicitly set to dark
+  // Initialize Dark Mode
   useEffect(() => {
-    // Check local storage only. Ignore window.matchMedia to force light mode default.
     const savedTheme = localStorage.getItem('theme');
     const isDark = savedTheme === 'dark';
     
@@ -34,6 +33,35 @@ function App() {
       document.documentElement.classList.remove('dark');
     }
   }, []);
+
+  // Handle Browser Back Button (PopState)
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      // If we are showing intro, ignore history changes or just stay there
+      if (showIntro) return;
+
+      const state = event.state;
+      
+      if (!state || state.view === 'menu') {
+        setView('menu');
+        setCurrentHymn(null);
+      } else if (state.view === 'members') {
+        setView('members');
+        setCurrentHymn(null);
+      } else if (state.view === 'hymns') {
+        setView('hymns');
+        setCurrentHymn(null);
+      } else if (state.view === 'detail') {
+        setView('hymns');
+        const hymn = HYMNS.find(h => h.id === state.hymnId);
+        if (hymn) setCurrentHymn(hymn);
+        else setCurrentHymn(null); // Fallback
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [showIntro]);
 
   const toggleDarkMode = () => {
     setDarkMode(prev => {
@@ -52,24 +80,28 @@ function App() {
   const handleEnterApp = () => {
     setShowIntro(false);
     setView('menu');
+    // Replace the current history entry (Intro) with Menu so we don't go back to Intro
+    window.history.replaceState({ view: 'menu' }, '');
   };
 
-  // Back Button Logic (Header Logo or Back Icons)
-  const handleBack = () => {
-    if (currentHymn) {
-      // If viewing a hymn details, go back to hymn list
-      setCurrentHymn(null);
-    } else if (view !== 'menu') {
-      // If in Members or Hymn List, go back to Menu
-      setView('menu');
-      setSearchTerm(''); // Reset search when returning to menu
-    }
-    // If in Menu, do nothing (already at top level)
+  // Back Button Logic (UI Button or Logo Click)
+  const handleBack = useCallback(() => {
+    if (view === 'menu') return; // Cannot go back from menu within app logic
+    
+    // Use browser history back, which triggers the popstate listener
+    window.history.back();
+  }, [view]);
+
+  // Navigation Handlers with History Push
+  const goToMembers = () => {
+    setView('members');
+    window.history.pushState({ view: 'members' }, '');
   };
 
-  // Navigation Handlers
-  const goToMembers = () => setView('members');
-  const goToHymns = () => setView('hymns');
+  const goToHymns = () => {
+    setView('hymns');
+    window.history.pushState({ view: 'hymns' }, '');
+  };
 
   // Filter logic for the LIST view
   const filteredHymns = useMemo(() => {
@@ -82,7 +114,6 @@ function App() {
     );
   }, [searchTerm]);
 
-  // Index logic for NAVIGATION (uses full list to allow sequential browsing)
   const currentIndex = useMemo(() => {
     if (!currentHymn) return -1;
     return HYMNS.findIndex(h => h.id === currentHymn.id);
@@ -90,19 +121,25 @@ function App() {
 
   const handleSelectHymn = (hymn: Hymn) => {
     setCurrentHymn(hymn);
+    window.history.pushState({ view: 'detail', hymnId: hymn.id }, '');
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const handleNextHymn = () => {
     if (currentIndex !== -1 && currentIndex < HYMNS.length - 1) {
-      setCurrentHymn(HYMNS[currentIndex + 1]);
+      const nextHymn = HYMNS[currentIndex + 1];
+      setCurrentHymn(nextHymn);
+      // Replace state instead of push to keep back button logic clean (Back goes to list)
+      window.history.replaceState({ view: 'detail', hymnId: nextHymn.id }, '');
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
   };
 
   const handlePrevHymn = () => {
     if (currentIndex > 0) {
-      setCurrentHymn(HYMNS[currentIndex - 1]);
+      const prevHymn = HYMNS[currentIndex - 1];
+      setCurrentHymn(prevHymn);
+      window.history.replaceState({ view: 'detail', hymnId: prevHymn.id }, '');
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
   };
@@ -111,7 +148,6 @@ function App() {
     return <IntroPage onEnter={handleEnterApp} />;
   }
 
-  // Render logic based on view state
   const renderContent = () => {
     if (view === 'menu') {
       return (
@@ -133,7 +169,7 @@ function App() {
             key={currentHymn.id}
             hymn={currentHymn} 
             initialSearchTerm={searchTerm}
-            onBack={() => setCurrentHymn(null)}
+            onBack={handleBack}
             onNext={handleNextHymn}
             onPrev={handlePrevHymn}
             canNext={currentIndex < HYMNS.length - 1}
@@ -153,12 +189,12 @@ function App() {
   };
 
   return (
-    // Note: The main background is set in index.html (bg-gold-gradient)
     <div className="min-h-screen font-sans">
       <Header 
         darkMode={darkMode} 
         toggleDarkMode={toggleDarkMode} 
-        onLogoClick={handleBack}
+        onBack={handleBack}
+        showBack={view !== 'menu'}
       />
 
       <main>

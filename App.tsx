@@ -104,15 +104,38 @@ function App() {
     window.history.pushState({ view: 'hymns' }, '');
   };
 
-  // Filter logic for the LIST view
+  // Filter logic for the LIST view with flexible Arabic matching
   const filteredHymns = useMemo(() => {
-    const term = searchTerm.toLowerCase().trim();
+    const term = searchTerm.trim();
     if (!term) return HYMNS;
 
-    return HYMNS.filter(hymn => 
-      hymn.title.toLowerCase().includes(term) || 
-      hymn.lyrics.toLowerCase().includes(term)
-    );
+    // Create a flexible regex pattern for Arabic characters
+    let pattern = '';
+    for (const char of term) {
+      if (['ا', 'أ', 'إ', 'آ'].includes(char)) {
+        pattern += '[اأإآ]';
+      } else if (['ي', 'ى'].includes(char)) {
+        pattern += '[يى]';
+      } else {
+        // Escape special regex characters
+        pattern += char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+    }
+
+    try {
+      const regex = new RegExp(pattern, 'i');
+      return HYMNS.filter(hymn => 
+        regex.test(hymn.title) || 
+        regex.test(hymn.lyrics)
+      );
+    } catch (e) {
+      // Fallback to basic inclusion if regex fails
+      const lowerTerm = term.toLowerCase();
+      return HYMNS.filter(hymn => 
+        hymn.title.toLowerCase().includes(lowerTerm) || 
+        hymn.lyrics.toLowerCase().includes(lowerTerm)
+      );
+    }
   }, [searchTerm]);
 
   const currentIndex = useMemo(() => {
@@ -160,54 +183,4 @@ function App() {
           onSelectHymns={goToHymns} 
         />
       );
-    }
-
-    if (view === 'members') {
-      return <ChoirMembers />;
-    }
-
-    if (view === 'hymns') {
-      if (currentHymn) {
-        return (
-          <HymnDetail 
-            key={currentHymn.id}
-            hymn={currentHymn} 
-            // Removed initialSearchTerm={searchTerm}
-            onBack={handleBack}
-            onNext={handleNextHymn}
-            onPrev={handlePrevHymn}
-            canNext={currentIndex < HYMNS.length - 1}
-            canPrev={currentIndex > 0}
-          />
-        );
-      }
-      return (
-        <HymnList 
-          hymns={filteredHymns}
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          onSelectHymn={handleSelectHymn} 
-        />
-      );
-    }
-  };
-
-  return (
-    <div className="min-h-screen font-sans">
-      <Header 
-        darkMode={darkMode} 
-        toggleDarkMode={toggleDarkMode} 
-        onBack={handleBack}
-        showBack={view !== 'menu'}
-      />
-
-      <main>
-        {renderContent()}
-      </main>
-
-      <ScrollToTop hasBottomNav={isDetailView} />
-    </div>
-  );
-}
-
-export default App;
+    

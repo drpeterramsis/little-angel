@@ -12,7 +12,6 @@ import { HYMNS } from './data';
 type ViewState = 'menu' | 'members' | 'hymns';
 
 function App() {
-  const [darkMode, setDarkMode] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   
   // Navigation State
@@ -21,19 +20,6 @@ function App() {
   // Hymn Data State
   const [searchTerm, setSearchTerm] = useState('');
   const [currentHymn, setCurrentHymn] = useState<Hymn | null>(null);
-
-  // Initialize Dark Mode
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const isDark = savedTheme === 'dark';
-    
-    setDarkMode(isDark);
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
 
   // Handle Browser Back Button (PopState)
   useEffect(() => {
@@ -63,20 +49,6 @@ function App() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [showIntro]);
-
-  const toggleDarkMode = () => {
-    setDarkMode(prev => {
-      const newMode = !prev;
-      if (newMode) {
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      }
-      return newMode;
-    });
-  };
 
   const handleEnterApp = () => {
     setShowIntro(false);
@@ -216,52 +188,47 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen font-sans relative text-zinc-900 dark:text-zinc-100">
+    <div className="min-h-screen font-sans relative text-white flex flex-col">
       
       {/* --- GLOBAL ANIMATED BACKGROUND --- */}
       {/* This sits behind all other content thanks to z-[-1] */}
-      <div className="fixed inset-0 z-[-1] select-none pointer-events-none overflow-hidden bg-zinc-100 dark:bg-black">
+      <div className="fixed inset-0 z-[-1] select-none pointer-events-none overflow-hidden bg-black">
         {/* Poster Image with Slow Pan Animation */}
         <div className="relative w-full h-[120%] -top-[10%]">
           <img 
             src="poster.webp" 
             alt="Background" 
-            className="w-full h-full object-cover object-top opacity-30 dark:opacity-40 animate-slow-pan transition-opacity duration-1000" 
+            className="w-full h-full object-cover object-top opacity-40 animate-slow-pan transition-opacity duration-1000" 
           />
         </div>
         
-        {/* Gradient Overlay for Readability */}
-        {/* Top is clearer, bottom is more obscure to help text pop */}
+        {/* Dark Mode Gradient Overlay */}
         <div 
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.85) 100%)'
-          }}
-        />
-        {/* Dark Mode Overlay */}
-        <div 
-          className="absolute inset-0 hidden dark:block"
-          style={{
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.8) 100%)'
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.85) 100%)'
           }}
         />
         
-        {/* Global Grain/Noise Texture (optional for glass feel) */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+        {/* Global Grain/Noise Texture */}
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" 
              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} 
         />
       </div>
 
       <Header 
-        darkMode={darkMode} 
-        toggleDarkMode={toggleDarkMode} 
         onBack={handleBack}
         showBack={view !== 'menu'}
       />
 
-      <main className="relative z-10">
+      <main className="relative z-10 flex-1">
         {renderContent()}
       </main>
+      
+      {/* Footer */}
+      <footer className="w-full py-8 text-center text-[11px] text-zinc-500 font-sans z-10 relative mt-auto border-t border-white/5 bg-black/40 backdrop-blur-md">
+         <p>Carlos Peter Ramsis © 2026 | v1.0.17 All Rights Reserved.</p>
+      </footer>
 
       <ScrollToTop hasBottomNav={isDetailView} />
     </div>

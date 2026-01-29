@@ -1,36 +1,42 @@
 import React from 'react';
-import { Moon, Sun, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface HeaderProps {
-  darkMode: boolean;
-  toggleDarkMode: () => void;
   onBack: () => void;
   showBack: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode, onBack, showBack }) => {
+export const Header: React.FC<HeaderProps> = ({ onBack, showBack }) => {
   return (
-    // iOS Glass Header: High blur, low opacity background, subtle border
-    <header className="sticky top-0 z-50 w-full bg-white/40 dark:bg-black/40 backdrop-blur-2xl border-b border-white/20 dark:border-white/5 shadow-sm transition-all duration-300">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+    // iOS 26 Glass Header: Ultra transparent, high blur, heavy bottom curve
+    <header className="sticky top-0 z-50 w-full bg-black/10 backdrop-blur-3xl border-b border-white/10 shadow-xl rounded-b-[40px] transition-all duration-300">
+      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4 w-full">
           {/* Back Button */}
-          {showBack && (
+          {showBack ? (
             <button 
               onClick={onBack}
-              className="p-2.5 rounded-full bg-white/20 dark:bg-white/10 hover:bg-white/40 dark:hover:bg-white/20 text-zinc-800 dark:text-zinc-100 transition-colors backdrop-blur-md"
+              className="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors backdrop-blur-md border border-white/10"
               aria-label="رجوع"
             >
               <ArrowRight size={22} />
             </button>
+          ) : (
+            // Spacer to keep logo centered or aligned if needed, or just hidden
+            <div className="w-[46px]" /> 
           )}
 
-          {/* Logo and Name Area */}
+          {/* Logo and Name Area - Centered relatively if possible, or left aligned */}
           <div 
-            className="flex items-center gap-3 select-none" 
+            className="flex items-center gap-3 select-none flex-1 justify-end sm:justify-start" 
           >
-            <div className="relative w-10 h-10 rounded-full overflow-hidden border border-white/40 dark:border-white/20 bg-white/20 dark:bg-white/5 flex items-center justify-center shadow-inner backdrop-blur-md">
+            <div className="flex flex-col items-end sm:items-start -space-y-0.5">
+              <h1 className="text-xl font-black tracking-tight text-white font-sans drop-shadow-md">Little angel</h1>
+              <span className="text-[11px] font-bold text-amber-400 opacity-90 tracking-wide">حفل نغمة أجيال</span>
+            </div>
+
+            <div className="relative w-12 h-12 rounded-full overflow-hidden border border-white/20 bg-white/5 flex items-center justify-center shadow-lg backdrop-blur-md">
                <img 
                 src="logo.webp" 
                 alt="شعار الملاك الصغير" 
@@ -40,22 +46,8 @@ export const Header: React.FC<HeaderProps> = ({ darkMode, toggleDarkMode, onBack
                 }}
                />
             </div>
-            
-            <div className="flex flex-col items-start -space-y-0.5">
-              <h1 className="text-lg font-extrabold tracking-tight text-zinc-900 dark:text-white font-sans drop-shadow-sm">Little angel</h1>
-              <span className="text-[10px] font-bold text-primary dark:text-amber-400 opacity-90">حفل نغمة أجيال</span>
-            </div>
           </div>
         </div>
-
-        {/* Theme Toggle */}
-        <button
-          onClick={toggleDarkMode}
-          className="p-2.5 rounded-full bg-white/20 dark:bg-black/30 text-zinc-700 dark:text-zinc-200 hover:bg-white/50 dark:hover:bg-white/10 transition-all backdrop-blur-md border border-white/20 dark:border-white/10 shadow-sm"
-          aria-label="تبديل الوضع الداكن"
-        >
-          {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
       </div>
     </header>
   );

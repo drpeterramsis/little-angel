@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, ChevronUp, ChevronDown, ChevronRight, ChevronLeft, Minus, Plus, Type } from 'lucide-react';
+import { Search, ChevronUp, ChevronDown, ChevronRight, ChevronLeft, Minus, Plus } from 'lucide-react';
 import { Hymn } from '../types';
 
 interface HymnDetailProps {
@@ -142,8 +142,8 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   return (
     <div className="flex flex-col min-h-[calc(100vh-80px)] pb-64">
       
-      {/* Glass Sticky Controls */}
-      <div className="sticky top-[10px] z-30 mx-4 mt-2">
+      {/* Glass Sticky Controls - Updated top to top-20 (80px) to clear the header */}
+      <div className="sticky top-20 z-30 mx-4 mt-2 transition-all duration-300">
         <div className="max-w-3xl mx-auto bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-3xl p-3 shadow-xl">
           <div className="flex flex-col gap-2">
             

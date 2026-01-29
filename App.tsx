@@ -198,7 +198,7 @@ function App() {
           <img 
             src="poster.webp" 
             alt="Background" 
-            className="w-full h-full object-cover object-top opacity-40 animate-slow-pan transition-opacity duration-1000" 
+            className="w-full h-full object-cover object-top opacity-60 animate-slow-pan transition-opacity duration-1000" 
           />
         </div>
         
@@ -206,7 +206,7 @@ function App() {
         <div 
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.85) 100%)'
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.85) 100%)'
           }}
         />
         
@@ -227,7 +227,7 @@ function App() {
       
       {/* Footer */}
       <footer className="w-full py-8 text-center text-[11px] text-zinc-500 font-sans z-10 relative mt-auto border-t border-white/5 bg-black/40 backdrop-blur-md">
-         <p>Carlos Peter Ramsis © 2026 | v1.0.17 All Rights Reserved.</p>
+         <p>Carlos Peter Ramsis © 2026 | v1.0.18 All Rights Reserved.</p>
       </footer>
 
       <ScrollToTop hasBottomNav={isDetailView} />

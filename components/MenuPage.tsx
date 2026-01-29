@@ -15,7 +15,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onSelectLittleAngel, onSelec
         {/* Button 1: Little Angel */}
         <button 
           onClick={onSelectLittleAngel}
-          className="w-full group relative bg-gradient-to-b from-yellow-500/20 via-black/60 to-black/90 backdrop-blur-xl border border-white/10 rounded-[40px] p-8 shadow-2xl hover:shadow-yellow-500/10 transition-all duration-500 transform hover:-translate-y-1 overflow-hidden"
+          className="w-full group relative bg-gradient-to-b from-yellow-500/20 via-yellow-500/5 via-60% to-black/90 backdrop-blur-xl border border-white/10 rounded-[40px] p-8 shadow-2xl hover:shadow-yellow-500/10 transition-all duration-500 transform hover:-translate-y-1 overflow-hidden"
         >
           {/* Glass Gloss Effect */}
           <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-50" />
@@ -34,7 +34,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ onSelectLittleAngel, onSelec
         {/* Button 2: Choir Hymns */}
         <button 
           onClick={onSelectHymns}
-          className="w-full group relative bg-gradient-to-b from-yellow-500/20 via-black/60 to-black/90 backdrop-blur-xl border border-white/10 rounded-[40px] p-8 shadow-2xl hover:shadow-yellow-500/10 transition-all duration-500 transform hover:-translate-y-1 overflow-hidden"
+          className="w-full group relative bg-gradient-to-b from-yellow-500/20 via-yellow-500/5 via-60% to-black/90 backdrop-blur-xl border border-white/10 rounded-[40px] p-8 shadow-2xl hover:shadow-yellow-500/10 transition-all duration-500 transform hover:-translate-y-1 overflow-hidden"
         >
            {/* Glass Gloss Effect */}
            <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-50" />

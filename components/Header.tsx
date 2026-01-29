@@ -9,7 +9,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ onBack, showBack }) => {
   return (
     // iOS 26 Glass Header: Ultra transparent, high blur, heavy bottom curve
-    <header className="sticky top-0 z-50 w-full bg-black/10 backdrop-blur-3xl border-b border-white/10 shadow-xl rounded-b-[40px] transition-all duration-300">
+    <header className="sticky top-0 z-50 w-full bg-black/5 backdrop-blur-3xl border-b border-white/10 shadow-xl rounded-b-[40px] transition-all duration-300">
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         
         <div className="flex items-center gap-4 w-full">

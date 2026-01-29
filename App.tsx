@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Header } from './components/Header';
+import { Footer } from './components/Footer';
 import { HymnList } from './components/HymnList';
 import { HymnDetail } from './components/HymnDetail';
 import { IntroPage } from './components/IntroPage';
@@ -193,10 +194,10 @@ function App() {
       {/* --- GLOBAL ANIMATED BACKGROUND --- */}
       {/* This sits behind all other content thanks to z-[-1] */}
       <div className="fixed inset-0 z-[-1] select-none pointer-events-none overflow-hidden bg-black">
-        {/* Poster Image - Zoomed out to see full image (h-full w-full object-cover) */}
+        {/* Background Image - Updated to background2.webp */}
         <div className="relative w-full h-full">
           <img 
-            src="poster.webp" 
+            src="background2.webp" 
             alt="Background" 
             className="w-full h-full object-cover opacity-60 transition-opacity duration-1000" 
           />
@@ -224,6 +225,8 @@ function App() {
       <main className="relative z-10 flex-1">
         {renderContent()}
       </main>
+
+      <Footer />
 
       <ScrollToTop hasBottomNav={isDetailView} />
     </div>

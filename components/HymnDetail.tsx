@@ -143,63 +143,67 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
     <div className="flex flex-col min-h-[calc(100vh-80px)] pb-64">
       
       {/* Glass Sticky Controls */}
-      <div className="sticky top-[70px] z-30 mx-4 mt-2">
-        <div className="max-w-3xl mx-auto bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-3xl p-4 shadow-xl">
-          <div className="flex flex-col gap-3">
+      <div className="sticky top-[10px] z-30 mx-4 mt-2">
+        <div className="max-w-3xl mx-auto bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-3xl p-3 shadow-xl">
+          <div className="flex flex-col gap-2">
             
-            {/* Top Row: Title and Font Controls */}
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold truncate text-zinc-900 dark:text-white drop-shadow-sm">{hymn.title}</h2>
-              
-              <div className="flex items-center gap-1 bg-white/30 dark:bg-white/10 rounded-xl p-1 border border-white/20">
-                <button 
-                  onClick={() => updateFontSize(fontSize - 2)}
-                  className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded-lg text-zinc-700 dark:text-zinc-200 transition-colors"
-                >
-                  <Minus size={16} />
-                </button>
-                <Type size={16} className="text-zinc-500 dark:text-zinc-400" />
-                <button 
-                  onClick={() => updateFontSize(fontSize + 2)}
-                  className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded-lg text-zinc-700 dark:text-zinc-200 transition-colors"
-                >
-                  <Plus size={16} />
-                </button>
-              </div>
+            {/* Row 1: Title */}
+            <div className="flex items-center justify-center">
+              <h2 className="text-lg font-bold truncate text-zinc-900 dark:text-white drop-shadow-sm">{hymn.title}</h2>
             </div>
 
-            {/* Internal Search Bar */}
+            {/* Row 2: Tools (Search + MatchNav + Font) */}
             <div className="flex items-center gap-2 w-full">
-              <div className="relative flex-1">
+              
+              {/* Flexible Search Container */}
+              <div className="relative flex-1 transition-all duration-300">
                 <input
                   type="text"
                   value={localSearch}
                   onChange={handleSearchChange}
-                  placeholder="بحث داخل الكلمات..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-white/40 dark:bg-black/40 rounded-xl border border-white/30 dark:border-white/10 focus:bg-white/60 dark:focus:bg-black/60 outline-none text-sm dark:text-white transition-all placeholder:text-zinc-500"
+                  placeholder="بحث..."
+                  className="w-full pl-8 pr-3 py-1.5 bg-white/40 dark:bg-black/40 rounded-lg border border-white/30 dark:border-white/10 focus:bg-white/60 dark:focus:bg-black/60 outline-none text-sm dark:text-white transition-all placeholder:text-zinc-500"
                 />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4" />
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-500 w-3.5 h-3.5" />
               </div>
               
+              {/* Match Navigation (Appears if matches > 0) */}
               {matchCount > 0 && (
-                <div className="flex items-center gap-1 animate-fade-in bg-white/30 dark:bg-black/30 rounded-xl p-1 border border-white/20">
-                  <span className="text-xs text-zinc-600 dark:text-zinc-300 whitespace-nowrap mx-2 font-mono font-bold">
+                <div className="flex items-center gap-1 animate-fade-in bg-white/30 dark:bg-black/30 rounded-lg p-0.5 border border-white/20 flex-shrink-0">
+                  <span className="text-[10px] text-zinc-600 dark:text-zinc-300 w-8 text-center font-mono font-bold">
                     {`${currentMatchIndex + 1}/${matchCount}`}
                   </span>
                   <button 
                     onClick={() => handleNavigation(currentMatchIndex - 1)}
-                    className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded-lg text-zinc-700 dark:text-zinc-200"
+                    className="p-1 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200"
                   >
-                    <ChevronUp size={16} />
+                    <ChevronUp size={14} />
                   </button>
                   <button 
                     onClick={() => handleNavigation(currentMatchIndex + 1)}
-                    className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded-lg text-zinc-700 dark:text-zinc-200"
+                    className="p-1 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200"
                   >
-                    <ChevronDown size={16} />
+                    <ChevronDown size={14} />
                   </button>
                 </div>
               )}
+
+               {/* Font Controls - Beside Search */}
+               <div className="flex items-center gap-1 bg-white/30 dark:bg-white/10 rounded-lg p-0.5 border border-white/20 flex-shrink-0">
+                <button 
+                  onClick={() => updateFontSize(fontSize - 2)}
+                  className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200 transition-colors"
+                >
+                  <Minus size={14} />
+                </button>
+                <button 
+                  onClick={() => updateFontSize(fontSize + 2)}
+                  className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200 transition-colors"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
+
             </div>
           </div>
         </div>
@@ -220,8 +224,8 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
         </div>
       </div>
 
-      {/* Sticky Bottom Navigation - Glass Style */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 z-50">
+      {/* Sticky Bottom Navigation - Moved UP (bottom-10) to clear footer */}
+      <div className="fixed bottom-10 left-0 right-0 p-4 z-50">
          <div className="max-w-3xl mx-auto flex items-center justify-between gap-4 bg-white/60 dark:bg-black/60 backdrop-blur-2xl border border-white/30 dark:border-white/10 rounded-2xl p-2 shadow-2xl">
             <button
               onClick={onPrev}

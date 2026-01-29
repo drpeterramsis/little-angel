@@ -193,12 +193,12 @@ function App() {
       {/* --- GLOBAL ANIMATED BACKGROUND --- */}
       {/* This sits behind all other content thanks to z-[-1] */}
       <div className="fixed inset-0 z-[-1] select-none pointer-events-none overflow-hidden bg-black">
-        {/* Poster Image with Slow Pan Animation */}
-        <div className="relative w-full h-[120%] -top-[10%]">
+        {/* Poster Image - Zoomed out to see full image (h-full w-full object-cover) */}
+        <div className="relative w-full h-full">
           <img 
             src="poster.webp" 
             alt="Background" 
-            className="w-full h-full object-cover object-top opacity-60 animate-slow-pan transition-opacity duration-1000" 
+            className="w-full h-full object-cover opacity-60 transition-opacity duration-1000" 
           />
         </div>
         
@@ -224,11 +224,6 @@ function App() {
       <main className="relative z-10 flex-1">
         {renderContent()}
       </main>
-      
-      {/* Footer */}
-      <footer className="w-full py-8 text-center text-[11px] text-zinc-500 font-sans z-10 relative mt-auto border-t border-white/5 bg-black/40 backdrop-blur-md">
-         <p>Carlos Peter Ramsis © 2026 | v1.0.18 All Rights Reserved.</p>
-      </footer>
 
       <ScrollToTop hasBottomNav={isDetailView} />
     </div>

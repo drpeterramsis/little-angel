@@ -7,7 +7,8 @@ interface MenuPageProps {
 
 export const MenuPage: React.FC<MenuPageProps> = ({ onSelectLittleAngel, onSelectHymns }) => {
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-[calc(100vh-140px)] w-full overflow-hidden">
+    // Changed: Fixed height to prevent scrolling, overflow-hidden
+    <div className="relative flex flex-col items-center justify-center h-[calc(100vh-100px)] w-full overflow-hidden">
       
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center gap-6 p-6 w-full animate-fade-in max-w-lg mx-auto">

@@ -216,7 +216,42 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen font-sans">
+    <div className="min-h-screen font-sans relative text-zinc-900 dark:text-zinc-100">
+      
+      {/* --- GLOBAL ANIMATED BACKGROUND --- */}
+      {/* This sits behind all other content thanks to z-[-1] */}
+      <div className="fixed inset-0 z-[-1] select-none pointer-events-none overflow-hidden bg-zinc-100 dark:bg-black">
+        {/* Poster Image with Slow Pan Animation */}
+        <div className="relative w-full h-[120%] -top-[10%]">
+          <img 
+            src="poster.webp" 
+            alt="Background" 
+            className="w-full h-full object-cover object-top opacity-30 dark:opacity-40 animate-slow-pan transition-opacity duration-1000" 
+          />
+        </div>
+        
+        {/* Gradient Overlay for Readability */}
+        {/* Top is clearer, bottom is more obscure to help text pop */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.85) 100%)'
+          }}
+        />
+        {/* Dark Mode Overlay */}
+        <div 
+          className="absolute inset-0 hidden dark:block"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.8) 100%)'
+          }}
+        />
+        
+        {/* Global Grain/Noise Texture (optional for glass feel) */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} 
+        />
+      </div>
+
       <Header 
         darkMode={darkMode} 
         toggleDarkMode={toggleDarkMode} 
@@ -224,7 +259,7 @@ function App() {
         showBack={view !== 'menu'}
       />
 
-      <main>
+      <main className="relative z-10">
         {renderContent()}
       </main>
 

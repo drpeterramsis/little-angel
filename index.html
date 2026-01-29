@@ -19,6 +19,15 @@
             colors: {
               primary: '#3b82f6',
               secondary: '#fbbf24',
+            },
+            animation: {
+              'slow-pan': 'slowPan 20s ease-in-out infinite',
+            },
+            keyframes: {
+              slowPan: {
+                '0%, 100%': { transform: 'translateY(0) scale(1.02)' },
+                '50%': { transform: 'translateY(-3%) scale(1.05)' },
+              }
             }
           }
         }
@@ -30,15 +39,9 @@
         scroll-behavior: smooth;
       }
       
-      /* Master Background Gradient - Gold */
-      .bg-gold-gradient {
-        background: linear-gradient(180deg, #fffce8 0%, #eebc3f 100%);
-        background-attachment: fixed; /* Keeps gradient fixed while scrolling */
-      }
-
-      /* Dark mode fallback or alternative */
-      .dark .bg-gold-gradient {
-        background: linear-gradient(180deg, #18181b 0%, #27272a 100%);
+      /* Base background fallback (dark grey) before image loads */
+      body {
+        background-color: #111;
       }
 
       /* Custom highlight fade transition */
@@ -69,6 +72,21 @@
       .animate-fade-in {
         animation: fadeIn 0.8s ease-out forwards;
       }
+      
+      /* Hide scrollbar for cleaner glass look but allow scroll */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2); 
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.4); 
+      }
     </style>
   <script type="importmap">
 {
@@ -82,7 +100,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-gold-gradient text-zinc-900 dark:text-zinc-100 transition-colors duration-300 min-h-screen">
+  <body class="text-zinc-900 dark:text-zinc-100 transition-colors duration-300 min-h-screen overflow-x-hidden">
     <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>

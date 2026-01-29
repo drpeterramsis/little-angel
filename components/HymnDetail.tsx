@@ -19,20 +19,16 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   canNext,
   canPrev
 }) => {
-  // Initialize with empty string so search is cleared when entering
   const [localSearch, setLocalSearch] = useState('');
   const [matchCount, setMatchCount] = useState(0);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(-1);
-  const [fontSize, setFontSize] = useState(24); // Default 24px
+  const [fontSize, setFontSize] = useState(24); 
   
-  // Refs for managing scrolling and highlighting
   const matchRefs = useRef<(HTMLElement | null)[]>([]);
   const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Parse lyrics into lines for rendering
   const lines = hymn.lyrics.split('\n');
 
-  // Load font size from local storage on mount
   useEffect(() => {
     const savedSize = localStorage.getItem('hymn-font-size');
     if (savedSize) {
@@ -40,42 +36,31 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
     }
   }, []);
 
-  // Save font size when changed
   const updateFontSize = (newSize: number) => {
-    // Limits: 16px to 64px
     const clamped = Math.max(16, Math.min(64, newSize));
     setFontSize(clamped);
     localStorage.setItem('hymn-font-size', clamped.toString());
   };
 
-  // Logic to find matches and scroll to them
   const handleNavigation = useCallback((index: number) => {
     if (matchCount === 0) return;
     
-    const safeIndex = (index + matchCount) % matchCount; // Handle wrap-around
+    const safeIndex = (index + matchCount) % matchCount; 
     setCurrentMatchIndex(safeIndex);
 
     const targetRef = matchRefs.current[safeIndex];
     if (targetRef) {
-      // 1. Scroll into view centrally
       targetRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-      // 2. Add Active Class
       targetRef.classList.add('highlight-active');
-
-      // 3. Clear existing timeout to prevent premature fading if user clicks fast
       if (highlightTimeoutRef.current) {
         clearTimeout(highlightTimeoutRef.current);
       }
-
-      // 4. Set timeout to remove class (fade out)
       highlightTimeoutRef.current = setTimeout(() => {
         targetRef.classList.remove('highlight-active');
-      }, 5000); // 5 seconds
+      }, 5000); 
     }
   }, [matchCount]);
 
-  // Helper to create flexible Arabic regex
   const getFlexibleRegex = (term: string) => {
     let pattern = '';
     for (const char of term) {
@@ -90,10 +75,8 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
     return new RegExp(pattern, 'gi');
   };
 
-  // Effect: Reset refs and calculate matches when search changes
   useEffect(() => {
-    matchRefs.current = []; // Reset refs
-    
+    matchRefs.current = []; 
     const term = localSearch.trim();
     if (!term) {
       setMatchCount(0);
@@ -105,9 +88,7 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
       const regex = getFlexibleRegex(term);
       const matches = hymn.lyrics.match(regex);
       const count = matches ? matches.length : 0;
-      
       setMatchCount(count);
-      
       if (count > 0) {
         setTimeout(() => handleNavigation(0), 100);
       } else {
@@ -119,25 +100,20 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
     }
   }, [localSearch, hymn.lyrics, handleNavigation]);
 
-  // Handle Search Input
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalSearch(e.target.value);
   };
 
-  // Helper to render text with highlighted spans that attach to refs
   const renderLineWithHighlights = (line: string) => {
     const term = localSearch.trim();
     if (!term) return line;
 
     try {
-      // Create regex with capturing group for splitting
       const patternString = getFlexibleRegex(term).source;
       const regex = new RegExp(`(${patternString})`, 'gi');
-      
       const parts = line.split(regex);
       
       return parts.map((part, i) => {
-        // Since we split by capturing group, odd indices are matches
         if (i % 2 === 1) {
           return (
             <span
@@ -156,92 +132,86 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
     }
   };
 
-  // More robust ref collection using querySelector after render
   useEffect(() => {
     const term = localSearch.trim();
     if (!term) return;
-
     const elements = document.querySelectorAll('[data-search-match="true"]');
     matchRefs.current = Array.from(elements) as HTMLElement[];
   }, [localSearch, lines]);
 
   return (
-    // Increased padding-bottom to pb-64 to allow scrolling well past the sticky footer/buttons
     <div className="flex flex-col min-h-[calc(100vh-80px)] pb-64">
       
-      {/* Detail Header / Nav */}
-      <div className="sticky top-[73px] z-30 bg-white/90 dark:bg-zinc-950/90 backdrop-blur border-b border-white/20 dark:border-zinc-800 px-4 py-3 shadow-sm">
-        <div className="max-w-3xl mx-auto flex flex-col gap-3">
-          
-          {/* Top Row: Title and Font Controls */}
-          <div className="flex items-center justify-between">
-            {/* Title only */}
-            <h2 className="text-xl font-bold truncate text-primary">{hymn.title}</h2>
+      {/* Glass Sticky Controls */}
+      <div className="sticky top-[70px] z-30 mx-4 mt-2">
+        <div className="max-w-3xl mx-auto bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-3xl p-4 shadow-xl">
+          <div className="flex flex-col gap-3">
             
-            {/* Font Controls */}
-            <div className="flex items-center gap-1 bg-zinc-100/80 dark:bg-zinc-800 rounded-lg p-1">
-              <button 
-                onClick={() => updateFontSize(fontSize - 2)}
-                className="p-1.5 hover:bg-white dark:hover:bg-zinc-700 rounded-md text-zinc-600 dark:text-zinc-300 transition-colors"
-                aria-label="تصغير الخط"
-              >
-                <Minus size={16} />
-              </button>
-              <Type size={16} className="text-zinc-400" />
-              <button 
-                onClick={() => updateFontSize(fontSize + 2)}
-                className="p-1.5 hover:bg-white dark:hover:bg-zinc-700 rounded-md text-zinc-600 dark:text-zinc-300 transition-colors"
-                aria-label="تكبير الخط"
-              >
-                <Plus size={16} />
-              </button>
-            </div>
-          </div>
-
-          {/* Internal Search Bar */}
-          <div className="flex items-center gap-2 w-full">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                value={localSearch}
-                onChange={handleSearchChange}
-                placeholder="بحث داخل الكلمات..."
-                className="w-full pl-10 pr-4 py-2 bg-white/80 dark:bg-zinc-900 rounded-lg border border-zinc-300 dark:border-zinc-700 focus:border-primary outline-none text-sm dark:text-white transition-all"
-              />
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
-            </div>
-            
-            {/* Search Navigation Buttons - Conditionally Rendered to save space when not in use */}
-            {matchCount > 0 && (
-              <div className="flex items-center gap-1 animate-fade-in">
-                <span className="text-xs text-zinc-500 whitespace-nowrap mx-1 font-mono">
-                  {`${currentMatchIndex + 1}/${matchCount}`}
-                </span>
+            {/* Top Row: Title and Font Controls */}
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold truncate text-zinc-900 dark:text-white drop-shadow-sm">{hymn.title}</h2>
+              
+              <div className="flex items-center gap-1 bg-white/30 dark:bg-white/10 rounded-xl p-1 border border-white/20">
                 <button 
-                  onClick={() => handleNavigation(currentMatchIndex - 1)}
-                  className="p-2 bg-white/80 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 shadow-sm"
+                  onClick={() => updateFontSize(fontSize - 2)}
+                  className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded-lg text-zinc-700 dark:text-zinc-200 transition-colors"
                 >
-                  <ChevronUp size={16} />
+                  <Minus size={16} />
                 </button>
+                <Type size={16} className="text-zinc-500 dark:text-zinc-400" />
                 <button 
-                  onClick={() => handleNavigation(currentMatchIndex + 1)}
-                  className="p-2 bg-white/80 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 shadow-sm"
+                  onClick={() => updateFontSize(fontSize + 2)}
+                  className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded-lg text-zinc-700 dark:text-zinc-200 transition-colors"
                 >
-                  <ChevronDown size={16} />
+                  <Plus size={16} />
                 </button>
               </div>
-            )}
+            </div>
+
+            {/* Internal Search Bar */}
+            <div className="flex items-center gap-2 w-full">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={localSearch}
+                  onChange={handleSearchChange}
+                  placeholder="بحث داخل الكلمات..."
+                  className="w-full pl-10 pr-4 py-2.5 bg-white/40 dark:bg-black/40 rounded-xl border border-white/30 dark:border-white/10 focus:bg-white/60 dark:focus:bg-black/60 outline-none text-sm dark:text-white transition-all placeholder:text-zinc-500"
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4" />
+              </div>
+              
+              {matchCount > 0 && (
+                <div className="flex items-center gap-1 animate-fade-in bg-white/30 dark:bg-black/30 rounded-xl p-1 border border-white/20">
+                  <span className="text-xs text-zinc-600 dark:text-zinc-300 whitespace-nowrap mx-2 font-mono font-bold">
+                    {`${currentMatchIndex + 1}/${matchCount}`}
+                  </span>
+                  <button 
+                    onClick={() => handleNavigation(currentMatchIndex - 1)}
+                    className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded-lg text-zinc-700 dark:text-zinc-200"
+                  >
+                    <ChevronUp size={16} />
+                  </button>
+                  <button 
+                    onClick={() => handleNavigation(currentMatchIndex + 1)}
+                    className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded-lg text-zinc-700 dark:text-zinc-200"
+                  >
+                    <ChevronDown size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Lyrics Content */}
-      <div className="flex-1 w-full max-w-3xl mx-auto p-6">
-        <div className="space-y-6 text-center">
+      <div className="flex-1 w-full max-w-3xl mx-auto p-6 mt-4">
+        <div className="space-y-6 text-center bg-white/20 dark:bg-black/20 backdrop-blur-md rounded-[32px] p-8 border border-white/20 dark:border-white/5 shadow-lg">
           {lines.map((line, index) => (
             <p 
               key={index} 
-              className="font-semibold leading-loose text-zinc-800 dark:text-zinc-200 font-sans transition-[font-size] duration-200"
+              className="font-bold leading-loose text-zinc-800 dark:text-zinc-100 font-sans transition-[font-size] duration-200 drop-shadow-sm"
               style={{ fontSize: `${fontSize}px` }}
             >
               {renderLineWithHighlights(line)}
@@ -250,16 +220,16 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
         </div>
       </div>
 
-      {/* Sticky Bottom Navigation for Hymns */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-zinc-950/90 backdrop-blur border-t border-zinc-200 dark:border-zinc-800 z-50">
-         <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
+      {/* Sticky Bottom Navigation - Glass Style */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 z-50">
+         <div className="max-w-3xl mx-auto flex items-center justify-between gap-4 bg-white/60 dark:bg-black/60 backdrop-blur-2xl border border-white/30 dark:border-white/10 rounded-2xl p-2 shadow-2xl">
             <button
               onClick={onPrev}
               disabled={!canPrev}
               className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
                 canPrev 
-                ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 active:scale-[0.98]' 
-                : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-300 dark:text-zinc-700 cursor-not-allowed'
+                ? 'bg-white/40 dark:bg-white/10 text-zinc-900 dark:text-white hover:bg-white/60 dark:hover:bg-white/20 border border-white/20' 
+                : 'bg-transparent text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
               }`}
             >
               <ChevronRight size={20} />
@@ -271,8 +241,8 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
               disabled={!canNext}
               className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
                 canNext 
-                ? 'bg-primary text-white hover:bg-blue-600 shadow-lg shadow-blue-500/20 active:scale-[0.98]' 
-                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-300 dark:text-zinc-700 cursor-not-allowed'
+                ? 'bg-primary/90 text-white hover:bg-primary shadow-lg shadow-primary/30 border border-white/20' 
+                : 'bg-transparent text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
               }`}
             >
               <span>التالي</span>

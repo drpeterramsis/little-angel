@@ -27,16 +27,14 @@ export const HymnList: React.FC<HymnListProps> = ({ hymns, searchTerm, onSearchC
     }
     
     try {
-      // Create regex with capturing group for splitting
       const regex = new RegExp(`(${pattern})`, 'gi');
       const parts = text.split(regex);
       
       return (
         <>
           {parts.map((part, i) => 
-            // When splitting with capture group, odd indices are the matches
             i % 2 === 1 ? (
-              <span key={i} className="bg-yellow-200 dark:bg-yellow-700/50 text-black dark:text-white rounded px-1 box-decoration-clone">
+              <span key={i} className="bg-yellow-300/60 dark:bg-yellow-600/60 text-black dark:text-white rounded px-1 box-decoration-clone">
                 {part}
               </span>
             ) : (
@@ -46,7 +44,6 @@ export const HymnList: React.FC<HymnListProps> = ({ hymns, searchTerm, onSearchC
         </>
       );
     } catch (e) {
-      // Fallback if regex fails
       return text;
     }
   };
@@ -55,48 +52,51 @@ export const HymnList: React.FC<HymnListProps> = ({ hymns, searchTerm, onSearchC
     <div className="w-full max-w-3xl mx-auto p-4 pb-20">
       
       {/* Search Bar - Sticky under header */}
-      <div className="sticky top-20 z-40 mb-6">
-        <div className="relative shadow-xl rounded-2xl">
+      <div className="sticky top-20 z-40 mb-8">
+        <div className="relative group">
+          <div className="absolute inset-0 bg-white/20 dark:bg-black/20 rounded-2xl blur-md -z-10"></div>
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="ابحث عن ترنيمة أو كلمات..."
-            className="w-full px-12 py-4 bg-white/90 dark:bg-zinc-800/90 backdrop-blur rounded-2xl border-2 border-white/50 dark:border-zinc-700 focus:border-primary outline-none transition-all text-lg placeholder:text-zinc-400 dark:text-white"
+            className="w-full px-12 py-4 bg-white/30 dark:bg-black/30 backdrop-blur-xl rounded-2xl border border-white/40 dark:border-white/10 focus:border-primary/50 focus:bg-white/50 dark:focus:bg-black/50 outline-none transition-all duration-300 text-lg placeholder:text-zinc-500 dark:placeholder:text-zinc-400 text-zinc-900 dark:text-white shadow-lg"
           />
-          <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 w-6 h-6" />
+          <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-zinc-400 w-6 h-6 pointer-events-none" />
         </div>
       </div>
 
       {/* List */}
       <div className="flex flex-col gap-4">
         {hymns.length === 0 ? (
-          <div className="text-center py-10 text-zinc-600 dark:text-zinc-300">
-            <p className="text-lg font-medium">لا توجد نتائج مطابقة</p>
+          <div className="text-center py-10">
+            <div className="bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-2xl p-8 inline-block">
+               <p className="text-lg font-medium text-zinc-600 dark:text-zinc-300">لا توجد نتائج مطابقة</p>
+            </div>
           </div>
         ) : (
           hymns.map((hymn) => (
             <div
               key={hymn.id}
               onClick={() => onSelectHymn(hymn)}
-              className="group bg-white/60 dark:bg-zinc-900/80 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-white/40 dark:border-zinc-800 hover:bg-white/80 dark:hover:bg-zinc-900 hover:border-primary/50 dark:hover:border-primary/50 cursor-pointer transition-all hover:shadow-lg transform hover:-translate-y-0.5"
+              className="group relative bg-white/30 dark:bg-black/40 backdrop-blur-lg p-6 rounded-3xl border border-white/40 dark:border-white/5 shadow-sm hover:shadow-xl hover:bg-white/50 dark:hover:bg-black/60 hover:scale-[1.01] cursor-pointer transition-all duration-300"
             >
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-4">
-                  <span className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary font-bold text-lg font-sans">
+                  <span className="flex items-center justify-center w-10 h-10 rounded-full bg-white/40 dark:bg-white/10 text-primary dark:text-blue-400 font-bold text-lg font-sans shadow-inner border border-white/20">
                     {hymn.id}
                   </span>
-                  <h3 className="text-xl font-bold text-zinc-800 dark:text-zinc-100">
+                  <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
                     {highlightText(hymn.title, searchTerm)}
                   </h3>
                 </div>
-                <ChevronLeft className="text-zinc-400 dark:text-zinc-600 group-hover:text-primary transition-colors" />
+                <div className="p-2 rounded-full bg-white/20 dark:bg-white/5 group-hover:bg-primary/20 dark:group-hover:bg-primary/20 transition-colors">
+                   <ChevronLeft className="text-zinc-500 dark:text-zinc-400 group-hover:text-primary transition-colors" size={20} />
+                </div>
               </div>
               
               {/* Show snippet if lyrics matched */}
-              {/* Use simple includes for quick check, but flexible regex for highlighting is handled inside the render */}
               {searchTerm && (
-                 /* We need to check flexible match to decide if we show the snippet div */
                  (function() {
                     let pattern = '';
                     for (const char of searchTerm) {
@@ -108,7 +108,7 @@ export const HymnList: React.FC<HymnListProps> = ({ hymns, searchTerm, onSearchC
                     return regex.test(hymn.lyrics);
                  })()
               ) && (
-                <div className="mt-3 mr-14 text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">
+                <div className="mt-4 mr-14 p-3 rounded-xl bg-white/20 dark:bg-black/20 text-sm text-zinc-700 dark:text-zinc-300 line-clamp-2 leading-relaxed border border-white/10">
                   {highlightText(
                      hymn.lyrics,
                      searchTerm

@@ -194,120 +194,105 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   };
 
   // Define dynamic classes for Full Screen Mode
+  // Updated: Changed z-index to z-[200] to cover Header (z-50) and Footer (z-40)
+  // Updated: Changed background to solid black in full screen to prevent transparency bleeding
   const rootClasses = isFullScreen 
-    ? "fixed inset-0 z-[100] bg-black/95 backdrop-blur-3xl overflow-y-auto pb-20 transition-all duration-300"
+    ? "fixed inset-0 z-[200] bg-black overflow-y-auto pb-20 transition-all duration-300"
     : "flex flex-col min-h-[calc(100vh-80px)] pb-64 transition-all duration-300";
 
   return (
     <div className={rootClasses}>
       
-      {/* Full Screen: Exit Button (Floating) */}
-      {isFullScreen && (
-        <button 
-          onClick={() => setIsFullScreen(false)}
-          className="fixed top-6 left-6 z-[110] p-3 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md transition-all shadow-lg border border-white/10 group"
-          aria-label="Exit Full Screen"
-        >
-          <Minimize size={24} className="group-hover:scale-90 transition-transform" />
-        </button>
-      )}
+      {/* Glass Sticky Controls - Visible in both modes, position adjusts */}
+      {/* Normal: top-20 (below header), FullScreen: top-4 (top of screen) */}
+      <div className={`sticky z-30 mx-4 mt-2 transition-all duration-300 ${isFullScreen ? 'top-4' : 'top-20'}`}>
+        <div className="max-w-3xl mx-auto bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-3xl p-3 shadow-xl">
+          <div className="flex flex-col gap-2">
+            
+            {/* Row 1: Title */}
+            <div className="flex items-center justify-center py-2">
+              <h2 className="text-2xl sm:text-3xl font-black truncate text-blue-400 drop-shadow-md tracking-wide">{hymn.title}</h2>
+            </div>
 
-      {/* Glass Sticky Controls - Hidden in Full Screen */}
-      {!isFullScreen && (
-        <div className="sticky top-20 z-30 mx-4 mt-2 transition-all duration-300">
-          <div className="max-w-3xl mx-auto bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-3xl p-3 shadow-xl">
-            <div className="flex flex-col gap-2">
+            {/* Row 2: Tools (Search + MatchNav + Font) */}
+            <div className="flex items-center gap-2 w-full">
               
-              {/* Row 1: Title */}
-              <div className="flex items-center justify-center py-2">
-                <h2 className="text-2xl sm:text-3xl font-black truncate text-blue-400 drop-shadow-md tracking-wide">{hymn.title}</h2>
+              {/* Flexible Search Container */}
+              <div className="relative flex-1 transition-all duration-300">
+                <input
+                  type="text"
+                  value={localSearch}
+                  onChange={handleSearchChange}
+                  placeholder="بحث..."
+                  className="w-full pl-8 pr-3 py-1.5 bg-white/40 dark:bg-black/40 rounded-lg border border-white/30 dark:border-white/10 focus:bg-white/60 dark:focus:bg-black/60 outline-none text-sm dark:text-white transition-all placeholder:text-zinc-500"
+                />
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-500 w-3.5 h-3.5" />
               </div>
-
-              {/* Row 2: Tools (Search + MatchNav + Font) */}
-              <div className="flex items-center gap-2 w-full">
-                
-                {/* Flexible Search Container */}
-                <div className="relative flex-1 transition-all duration-300">
-                  <input
-                    type="text"
-                    value={localSearch}
-                    onChange={handleSearchChange}
-                    placeholder="بحث..."
-                    className="w-full pl-8 pr-3 py-1.5 bg-white/40 dark:bg-black/40 rounded-lg border border-white/30 dark:border-white/10 focus:bg-white/60 dark:focus:bg-black/60 outline-none text-sm dark:text-white transition-all placeholder:text-zinc-500"
-                  />
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-500 w-3.5 h-3.5" />
-                </div>
-                
-                {/* Match Navigation (Appears if matches > 0) */}
-                {matchCount > 0 && (
-                  <div className="flex items-center gap-1 animate-fade-in bg-white/30 dark:bg-black/30 rounded-lg p-0.5 border border-white/20 flex-shrink-0">
-                    <span className="text-[10px] text-zinc-600 dark:text-zinc-300 w-8 text-center font-mono font-bold">
-                      {`${currentMatchIndex + 1}/${matchCount}`}
-                    </span>
-                    <button 
-                      onClick={() => handleNavigation(currentMatchIndex - 1)}
-                      className="p-1 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200"
-                    >
-                      <ChevronUp size={14} />
-                    </button>
-                    <button 
-                      onClick={() => handleNavigation(currentMatchIndex + 1)}
-                      className="p-1 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200"
-                    >
-                      <ChevronDown size={14} />
-                    </button>
-                  </div>
-                )}
-
-                {/* Font Controls + Full Screen Button */}
-                <div className="flex items-center gap-1 bg-white/30 dark:bg-white/10 rounded-lg p-0.5 border border-white/20 flex-shrink-0">
-                  {/* Font Family Switcher */}
+              
+              {/* Match Navigation (Appears if matches > 0) */}
+              {matchCount > 0 && (
+                <div className="flex items-center gap-1 animate-fade-in bg-white/30 dark:bg-black/30 rounded-lg p-0.5 border border-white/20 flex-shrink-0">
+                  <span className="text-[10px] text-zinc-600 dark:text-zinc-300 w-8 text-center font-mono font-bold">
+                    {`${currentMatchIndex + 1}/${matchCount}`}
+                  </span>
                   <button 
-                    onClick={cycleFont}
-                    className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200 transition-colors border-l border-white/10 ml-0.5"
-                    title="تغيير الخط"
+                    onClick={() => handleNavigation(currentMatchIndex - 1)}
+                    className="p-1 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200"
                   >
-                    <Type size={14} />
-                  </button>
-
-                  <button 
-                    onClick={() => updateFontSize(fontSize - 2)}
-                    className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200 transition-colors"
-                  >
-                    <Minus size={14} />
+                    <ChevronUp size={14} />
                   </button>
                   <button 
-                    onClick={() => updateFontSize(fontSize + 2)}
-                    className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200 transition-colors"
+                    onClick={() => handleNavigation(currentMatchIndex + 1)}
+                    className="p-1 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200"
                   >
-                    <Plus size={14} />
-                  </button>
-                  
-                  {/* Full Screen Toggle */}
-                  <button 
-                    onClick={() => setIsFullScreen(true)}
-                    className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200 transition-colors border-r border-white/10 mr-0.5"
-                    title="ملء الشاشة"
-                  >
-                    <Maximize size={14} />
+                    <ChevronDown size={14} />
                   </button>
                 </div>
+              )}
 
+              {/* Font Controls + Full Screen Button */}
+              <div className="flex items-center gap-1 bg-white/30 dark:bg-white/10 rounded-lg p-0.5 border border-white/20 flex-shrink-0">
+                {/* Font Family Switcher */}
+                <button 
+                  onClick={cycleFont}
+                  className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200 transition-colors border-l border-white/10 ml-0.5"
+                  title="تغيير الخط"
+                >
+                  <Type size={14} />
+                </button>
+
+                <button 
+                  onClick={() => updateFontSize(fontSize - 2)}
+                  className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200 transition-colors"
+                >
+                  <Minus size={14} />
+                </button>
+                <button 
+                  onClick={() => updateFontSize(fontSize + 2)}
+                  className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200 transition-colors"
+                >
+                  <Plus size={14} />
+                </button>
+                
+                {/* Full Screen Toggle (Icon changes based on state) */}
+                <button 
+                  onClick={() => setIsFullScreen(!isFullScreen)}
+                  className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200 transition-colors border-r border-white/10 mr-0.5"
+                  title={isFullScreen ? "خروج من ملء الشاشة" : "ملء الشاشة"}
+                >
+                  {isFullScreen ? <Minimize size={14} /> : <Maximize size={14} />}
+                </button>
               </div>
+
             </div>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Lyrics Content */}
-      <div className={`flex-1 w-full max-w-3xl mx-auto p-6 ${isFullScreen ? 'pt-20' : 'mt-4'}`}>
-        {/* Full Screen Title (Since sticky header is hidden) */}
-        {isFullScreen && (
-           <div className="mb-10 text-center animate-fade-in">
-             <h2 className="text-3xl font-black text-blue-400 drop-shadow-md tracking-wide">{hymn.title}</h2>
-             <div className="h-1 w-16 bg-blue-500/50 mx-auto mt-4 rounded-full"></div>
-           </div>
-        )}
+      <div className={`flex-1 w-full max-w-3xl mx-auto p-6 ${isFullScreen ? 'pt-6' : 'mt-4'}`}>
+        
+        {/* Note: Title is removed from here in Full Screen because the Sticky Bar is now visible */}
 
         <div className={`space-y-6 text-center rounded-[32px] p-8 border shadow-lg transition-all duration-500 ${
           isFullScreen 

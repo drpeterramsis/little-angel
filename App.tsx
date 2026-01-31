@@ -144,6 +144,20 @@ function App() {
   // Determine if we are currently looking at a single hymn detail page
   const isDetailView = view === 'hymns' && currentHymn !== null;
 
+  // Dynamic Background Logic
+  const getBackgroundImage = () => {
+    if (view === 'hymns') {
+      if (currentHymn) {
+        // Hymn Details View
+        return 'empty.webp';
+      }
+      // Hymn List View
+      return 'music.webp';
+    }
+    // Default for Menu and Members
+    return 'background2.webp';
+  };
+
   if (showIntro) {
     return <IntroPage onEnter={handleEnterApp} />;
   }
@@ -194,12 +208,12 @@ function App() {
       {/* --- GLOBAL ANIMATED BACKGROUND --- */}
       {/* This sits behind all other content thanks to z-[-1] */}
       <div className="fixed inset-0 z-[-1] select-none pointer-events-none overflow-hidden bg-black">
-        {/* Background Image - Updated to background2.webp */}
+        {/* Background Image - Dynamic based on view */}
         <div className="relative w-full h-full">
           <img 
-            src="background2.webp" 
+            src={getBackgroundImage()} 
             alt="Background" 
-            className="w-full h-full object-cover opacity-60 transition-opacity duration-1000" 
+            className="w-full h-full object-cover opacity-60 transition-all duration-500" 
           />
         </div>
         

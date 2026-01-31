@@ -4,6 +4,17 @@ Application for the Little Angel Choir - Naghamat Ajyal Concert.
 
 ## Updates
 
+### Version 1.0.36
+- **Photo Gallery**: 
+    - Added swipe gesture support (Right-to-Left for Next, consistent with Arabic flow).
+    - Added navigation arrows for desktop/helper.
+    - Added photo index counter.
+- **Hymn Details**:
+    - Added Hymn Number badge to the sticky header.
+    - Reversed swipe logic: Swipe Right to go Next, Swipe Left to go Previous (Arabic Book style).
+- **Video Player**: 
+    - Optimized resolution preference to 480p to save data.
+
 ### Version 1.0.35
 - **Video Player**: Refactored video section to have a separate list view and player view.
     - Browsing back from a video now returns to the list instead of the main menu.

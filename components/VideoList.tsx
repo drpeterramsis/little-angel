@@ -38,7 +38,8 @@ export const VideoList: React.FC<VideoListProps> = ({ videos, selectedVideo, onS
          <div className="w-full flex-1 bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10 relative">
             {videoId ? (
               <iframe 
-                src={`https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0`}
+                // Added vq=large for 480p preference
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&vq=large`}
                 title={selectedVideo.title}
                 className="w-full h-full absolute inset-0"
                 frameBorder="0"

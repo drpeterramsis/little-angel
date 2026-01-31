@@ -122,8 +122,11 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
 
     if (Math.abs(diffX) > Math.abs(diffY)) {
        if (Math.abs(diffX) > 50) {
-         if (diffX > 0 && canNext) onNext();
-         if (diffX < 0 && canPrev) onPrev();
+         // ARABIC BOOK REVERSE LOGIC
+         // diffX < 0 means Swipe Right (Left to Right) -> NEXT
+         // diffX > 0 means Swipe Left (Right to Left) -> PREV
+         if (diffX < 0 && canNext) onNext();
+         if (diffX > 0 && canPrev) onPrev();
        }
     }
     
@@ -246,8 +249,15 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
         <div className="max-w-3xl mx-auto bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-3xl p-3 shadow-xl">
           <div className="flex flex-col gap-2">
             
-            <div className="flex items-center justify-center py-2">
-              <h2 className="text-2xl sm:text-3xl font-black truncate text-blue-400 drop-shadow-md tracking-wide">{hymn.title}</h2>
+            <div className="flex items-center justify-center py-2 relative">
+               {/* Hymn Number Badge */}
+               <div className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center border border-white/10 text-white font-bold font-mono text-sm">
+                 {hymn.id}
+               </div>
+               
+               <h2 className="text-2xl sm:text-3xl font-black truncate text-blue-400 drop-shadow-md tracking-wide px-10">
+                 {hymn.title}
+               </h2>
             </div>
 
             <div className="flex items-center gap-2 w-full">

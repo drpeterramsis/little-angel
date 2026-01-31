@@ -94,7 +94,7 @@ export const IntroPage: React.FC<IntroPageProps> = ({ onEnter }) => {
 
             {/* Version Number */}
             <div className="text-[10px] text-zinc-400 font-medium">
-              v1.0.27
+              v1.0.28
             </div>
          </div>
       </div>

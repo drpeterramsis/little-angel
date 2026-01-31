@@ -6,11 +6,13 @@ import { HymnDetail } from './components/HymnDetail';
 import { IntroPage } from './components/IntroPage';
 import { MenuPage } from './components/MenuPage';
 import { ChoirMembers } from './components/ChoirMembers';
+import { VideoList } from './components/VideoList'; // Import VideoList
 import { ScrollToTop } from './components/ScrollToTop';
 import { Hymn } from './types';
-import { HYMNS } from './data';
+import { HYMNS, CHOIR_VIDEOS } from './data'; // Import Video Data
 
-type ViewState = 'menu' | 'members' | 'hymns';
+// Added 'videos' to ViewState
+type ViewState = 'menu' | 'members' | 'hymns' | 'videos';
 
 function App() {
   const [showIntro, setShowIntro] = useState(true);
@@ -38,6 +40,9 @@ function App() {
         setCurrentHymn(null);
       } else if (state.view === 'hymns') {
         setView('hymns');
+        setCurrentHymn(null);
+      } else if (state.view === 'videos') { // Handle video view back
+        setView('videos');
         setCurrentHymn(null);
       } else if (state.view === 'detail') {
         setView('hymns');
@@ -75,6 +80,11 @@ function App() {
   const goToHymns = () => {
     setView('hymns');
     window.history.pushState({ view: 'hymns' }, '');
+  };
+
+  const goToVideos = () => {
+    setView('videos');
+    window.history.pushState({ view: 'videos' }, '');
   };
 
   // Filter logic for the LIST view with flexible Arabic matching
@@ -154,6 +164,10 @@ function App() {
       // Hymn List View
       return 'music.webp';
     }
+    // New background logic for videos if needed, or share with members/menu
+    if (view === 'videos') {
+      return 'music.webp'; // Reusing music background for video list
+    }
     // Default for Menu and Members
     return 'background2.webp';
   };
@@ -167,13 +181,18 @@ function App() {
       return (
         <MenuPage 
           onSelectLittleAngel={goToMembers} 
-          onSelectHymns={goToHymns} 
+          onSelectHymns={goToHymns}
+          onSelectVideos={goToVideos} 
         />
       );
     }
 
     if (view === 'members') {
       return <ChoirMembers />;
+    }
+
+    if (view === 'videos') {
+      return <VideoList videos={CHOIR_VIDEOS} />;
     }
 
     if (view === 'hymns') {

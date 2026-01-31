@@ -1,4 +1,4 @@
-import { Hymn, ChoirMember } from './types';
+import { Hymn, ChoirMember, ChoirVideo } from './types';
 
 /**
  * MANUAL COLOR TAGS GUIDE:
@@ -902,27 +902,32 @@ export const HYMNS: Hymn[] = [
 و قلبي مش هايفرح مادام هو زعلان
 
 
- [B] قام فر مني وجه جنبي يسوعي 
- [B] في لحظة لقيته جنبي وحسيت بالأمان
+[B] قام فر مني وجه جنبي يسوعي 
+[B] في لحظة لقيته جنبي وحسيت بالأمان
+
 
 [Y] قام فر مني وجه جنبي يسوعي 
 [Y] في لحظة لقيته جنبي وحسيت بالأمان
+
 
 [B] خدها نصيحة على مدي الأيام 
 [B] إبليس لو جالك ماتسمعلوش كلام 
 
 
- [Y] قول له يا شاطر ماتتشطرش  عليا 
- [Y] علشان أنا مش قدك مالكش معايا كلام 
+[Y] قول له يا شاطر ماتتشطرش  عليا 
+[Y] علشان أنا مش قدك مالكش معايا كلام 
 
- [B] إن كنت شاطر تروح تتحدى ربي 
- [B] وهو هايوري لك ويغلبك كمان 
+
+[B] إن كنت شاطر تروح تتحدى ربي 
+[B] وهو هايوري لك ويغلبك كمان 
+
 
 [Y] علي علشان أنا مش قدك 
 [Y] مالكش معايا كلام 
 
- [B] إن كنت شاطر تروح تتحدى ربي 
- [B] وهو هايوري لك ويغلبك كمان 
+
+[B] إن كنت شاطر تروح تتحدى ربي 
+[B] وهو هايوري لك ويغلبك كمان 
  
  
  `
@@ -930,83 +935,164 @@ export const HYMNS: Hymn[] = [
   {
     id: 14,
     title: "نفسى اعيش مبسوط",
-    lyrics: `نفسى أعيش مبسوط وياك يا بابا يسوع
-نفسى ما تسمع صوت غير صوت قلبى المسموع
+    lyrics: `
+    
+[Y] نفسى أعيش مبسوط 
+[Y] وياك يا بابا يسوع
 
-وأغمض عينى وأصلى وأحكى لك كل متاعبى
-وأنت وياى ياربى بإيديك الحلوة حاضني
+[Y] نفسى ما تسمع صوت 
+[Y] غير صوت قلبى المسموع
 
-    نفسى أعيش مبسوط وياك يا بابا يسوع
-نفسى ما تسمع صوت غير صوت قلبى المسموع
+وأغمض عينى وأصلى 
+وأحكى لك كل متاعبى
+
+وأنت وياى ياربى 
+بإيديك الحلوة حاضني
+
+[Y] نفسى أعيش مبسوط 
+[Y] وياك يا بابا يسوع
+
+[Y] نفسى ما تسمع صوت 
+[Y] غير صوت قلبى المسموع
 
 لحظات حلوة فى حياتى 
 وأنا واقف أقرأ مزمور
+
 وما فيش فى الأوضة 
 وياى غيرك وماليها نور
 
-   نفسى أعيش مبسوط وياك يا بابا يسوع
-نفسى ما تسمع صوت غير صوت قلبى المسموع
+
+
+[Y] نفسى أعيش مبسوط 
+[Y] وياك يا بابا يسوع
+
+[Y] نفسى ما تسمع صوت 
+[Y] غير صوت قلبى المسموع
 
 يا سلام يا يسوع لحظات
 وبسرعة مرت بى
+
 وأقف وبأقول صلوات
-وملايكة رايحة وجاية`
+وملايكة رايحة وجاية
+
+
+[Y] نفسى أعيش مبسوط 
+[Y] وياك يا بابا يسوع
+
+[Y] نفسى ما تسمع صوت 
+[Y] غير صوت قلبى المسموع
+
+
+`
   },
   {
     id: 15,
     title: "ترنيمة Joy",
-    lyrics: `I’ve got the joy, joy, joy, joy down in my heart
-Where?
+    lyrics: `
+    
+I’ve got the joy, joy, joy, joy
+down in my heart
+
+[Y] Where?
+
 Down in my heart!
-Where?
+
+[Y] Where?
+
 Down in my heart!
-I’ve got the joy, joy, joy, joy down in my heart
-Where? 
+
+I’ve got the joy, joy, joy, joy
+down in my heart
+
+[Y] Where? 
+
 Down in my heart to stay
 
-And I’m so happy, so very happy
-I’ve got the love of Jesus in my heart
-Down in my heart(2)
 
-I’ve got the love of Jesus, love of Jesus down in my heart
-Where?
+And I’m so happy, so very happy
+
+I’ve got the love of Jesus in my heart
+
+
+And I’m so happy, so very happy
+
+I’ve got the love of Jesus in my heart
+
+
+
+I’ve got the love of Jesus, love of Jesus
+down in my heart
+
+[Y] Where? 
+
 Down in my heart!
-Where?
+
+[Y] Where? 
+
 Down in my heart!
-I’ve got the love of Jesus, love of Jesus down in my heart
-Where?
+
+I’ve got the love of Jesus, love of Jesus
+down in my heart
+
+[Y] Where? 
+
 Down in my heart to stay.
 
 I've got the peace that passeth understanding,
 Down in my heart,
-Where? 
+
+[Y] Where? 
+
 Down in my heart
-Where? 
+
+[Y] Where? 
+
 Down in my heart
 
 I've got the peace that passeth understanding,
 Down in my heart,
-Where? 
+
+[Y] Where? 
+
 Down in my heart to stay.
 
 I’ve got the love of Jesus
 Down in my heart,
-Where? 
+
+[Y] Where? 
+
 Down in my heart 
-Where? 
+
+[Y] Where? 
+
 Down in my heart 
+
 I’ve got the love of Jesus,
+
 Down in my heart 
-Where? 
+
+[Y] Where? 
+
 down in my heart to stay
+
  انا عندي فرح، فرح، فرح في قلبي
+
 فين؟
+
 فرح في قلبي
+
 فين؟
+
 فرح في قلبي
+
 انا عندي فرح، فرح،فرح في قلبي
+
 فين؟
-فرح في قلبي على طول`
+
+فرح في قلبي على طول 
+
+
+`
   }
 ];
 
@@ -1023,4 +1109,25 @@ export const CHOIR_MEMBERS: ChoirMember[] = [
   { id: 10, name: "جولي", role: "مرنمة" },
   { id: 11, name: "فادي", role: "إيقاع" },
   { id: 12, name: "مارك", role: "هندسة صوتية" }
+];
+
+// Added new Choir Videos data
+export const CHOIR_VIDEOS: ChoirVideo[] = [
+  { id: 1, title: "ترنيمه لينا شفيع - كورال ليتل انجيل", link: "https://www.youtube.com/watch?v=5Z1h1KsaPQI" },
+  { id: 2, title: "كورال ليتل انجيل / اسبسمس واطس لصوم الرسل", link: "https://www.youtube.com/watch?v=m3l_25cJy5w" },
+  { id: 3, title: "كورال ليتل انجيل \\ ترنيمه بتحبني", link: "https://www.youtube.com/watch?v=gkHX-PuXe9Y" },
+  { id: 4, title: "كورال ليتل انجيل \\ لحن نيم غار", link: "https://www.youtube.com/watch?v=wliArxYqlJw" },
+  { id: 5, title: "كورال ليتل انجيل \\ ترنيمة عندي سؤال", link: "https://www.youtube.com/watch?v=VBKuUtmawkk" },
+  { id: 6, title: "ترنيمة قديس صامت | كورال ليتل انجيل", link: "https://www.youtube.com/watch?v=YXa4ZDrO4gc" },
+  { id: 7, title: "ترنيمة نونو صغير / كورال little angel", link: "https://www.youtube.com/watch?v=K1dSGr41idA" },
+  { id: 8, title: "ترنيمة السنة ديا \\ كورال Little angel", link: "https://www.youtube.com/watch?v=SVca7DV3GYs" },
+  { id: 9, title: "افرحي يا والدة الاإله كورال little angel", link: "https://www.youtube.com/watch?v=ucYUuCN-FvA" },
+  { id: 10, title: "ترنيمه بنت مطيعة كورال اطفال little angel", link: "https://www.youtube.com/watch?v=QyOiI_Ze-eU" },
+  { id: 11, title: "ترنيمه 70 كارز اسم الكورال: كورال أطفال little Angel", link: "https://www.youtube.com/watch?v=qBw6qYpWdf0" },
+  { id: 12, title: "ترنيمه Happy birthday to jesus _كورال اطفال little angel", link: "https://www.youtube.com/watch?v=27BHaO7aLxg" },
+  { id: 13, title: "ترنيمة باب المزود_لكورال اطفال LITTLE ANGEL", link: "https://www.youtube.com/watch?v=nZ-YXtb0BY8" },
+  { id: 14, title: "ترنيمة لفت ساعه _كورال اطفالlittle angel", link: "https://www.youtube.com/watch?v=Hd8TqN32zsU" },
+  { id: 15, title: "لحن تينين للثلاثه فتيه القديسين...كورال اطفال little angel", link: "https://www.youtube.com/watch?v=he2XQM7mJNc" },
+  { id: 16, title: "ترنيمه القيامه.. اطلعي يا شمس", link: "https://www.youtube.com/watch?v=vS1Hbk0OntA" },
+  { id: 17, title: "لحن أنا الصغير في إخوتي.. كورال أطفال little Angel", link: "https://www.youtube.com/watch?v=e7a3ilkjWWo" }
 ];

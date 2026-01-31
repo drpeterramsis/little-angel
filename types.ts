@@ -10,6 +10,13 @@ export interface ChoirMember {
   role: string;
 }
 
+// Added interface for YouTube videos
+export interface ChoirVideo {
+  id: number;
+  title: string;
+  link: string;
+}
+
 export interface SearchState {
   term: string;
   triggerHighlight: boolean;

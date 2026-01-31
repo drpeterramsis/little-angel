@@ -26,6 +26,7 @@ function App() {
   // Content State
   const [searchTerm, setSearchTerm] = useState('');
   const [currentHymn, setCurrentHymn] = useState<Hymn | null>(null);
+  const [lastViewedHymnId, setLastViewedHymnId] = useState<number | null>(null); // New state for highlighting
   const [selectedVideo, setSelectedVideo] = useState<ChoirVideo | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
 
@@ -40,35 +41,37 @@ function App() {
 
       const state = event.state;
       
-      // Reset all content states by default when popping, specific blocks will set them if needed
+      // Reset content states
       setCurrentHymn(null);
       setSelectedVideo(null);
       setSelectedPhoto(null);
 
       if (!state || state.view === 'menu') {
         setView('menu');
+        setLastViewedHymnId(null); // Reset highlight when back to menu
       } else if (state.view === 'members') {
         setView('members');
       } else if (state.view === 'hymns') {
         setView('hymns');
+        // Note: We do NOT reset lastViewedHymnId here, so the list stays highlighted
       } else if (state.view === 'videos') {
         setView('videos');
-        // Check if we popped back to a specific video state
         if (state.videoId) {
            const video = CHOIR_VIDEOS.find(v => v.id === state.videoId);
            if (video) setSelectedVideo(video);
         }
       } else if (state.view === 'photos') {
         setView('photos');
-        // Check if we popped back to a specific photo state
         if (state.photoId) {
            setSelectedPhoto(state.photoId);
         }
       } else if (state.view === 'detail') {
-        // Hymn Detail
         setView('hymns');
         const hymn = HYMNS.find(h => h.id === state.hymnId);
-        if (hymn) setCurrentHymn(hymn);
+        if (hymn) {
+          setCurrentHymn(hymn);
+          setLastViewedHymnId(hymn.id); // Ensure ID is tracked if we navigated forward somehow
+        }
       }
     };
 
@@ -79,18 +82,18 @@ function App() {
   const handleEnterApp = () => {
     setShowIntro(false);
     setView('menu');
-    // Replace the current history entry (Intro) with Menu
+    setLastViewedHymnId(null);
     window.history.replaceState({ view: 'menu' }, '');
   };
 
   // Back Button Logic (UI Button or Logo Click)
   const handleBack = useCallback(() => {
-    setHeaderTitle(null); // Ensure title resets
+    setHeaderTitle(null);
     if (view === 'menu') return;
     window.history.back();
   }, [view]);
 
-  // Navigation Handlers with History Push
+  // Navigation Handlers
   const goToMembers = () => {
     setView('members');
     window.history.pushState({ view: 'members' }, '');
@@ -98,6 +101,10 @@ function App() {
 
   const goToHymns = () => {
     setView('hymns');
+    // We can clear highlight here if we want "fresh" entry from menu, 
+    // but handlePopState handles the 'menu' case which covers back navigation.
+    // If entering fresh from menu button, we might want to clear it too.
+    setLastViewedHymnId(null); 
     window.history.pushState({ view: 'hymns' }, '');
   };
 
@@ -116,7 +123,6 @@ function App() {
     const term = searchTerm.trim();
     if (!term) return HYMNS;
 
-    // Flexible Arabic regex
     let pattern = '';
     for (const char of term) {
       if (['ا', 'أ', 'إ', 'آ'].includes(char)) {
@@ -150,6 +156,7 @@ function App() {
 
   const handleSelectHymn = (hymn: Hymn) => {
     setCurrentHymn(hymn);
+    setLastViewedHymnId(hymn.id); // Track viewed hymn
     window.history.pushState({ view: 'detail', hymnId: hymn.id }, '');
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
@@ -158,6 +165,7 @@ function App() {
     if (currentIndex !== -1 && currentIndex < HYMNS.length - 1) {
       const nextHymn = HYMNS[currentIndex + 1];
       setCurrentHymn(nextHymn);
+      setLastViewedHymnId(nextHymn.id);
       window.history.replaceState({ view: 'detail', hymnId: nextHymn.id }, '');
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
@@ -167,6 +175,7 @@ function App() {
     if (currentIndex > 0) {
       const prevHymn = HYMNS[currentIndex - 1];
       setCurrentHymn(prevHymn);
+      setLastViewedHymnId(prevHymn.id);
       window.history.replaceState({ view: 'detail', hymnId: prevHymn.id }, '');
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
@@ -176,7 +185,6 @@ function App() {
   const handleSelectVideo = (video: ChoirVideo | null) => {
     setSelectedVideo(video);
     if (video) {
-      // Push state so Back button returns to list
       window.history.pushState({ view: 'videos', videoId: video.id }, '');
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -184,16 +192,26 @@ function App() {
 
   // --- PHOTOS LOGIC ---
   const handleSelectPhoto = (photoId: number | null) => {
-    setSelectedPhoto(photoId);
-    if (photoId !== null) {
-      // Push state so Back button closes gallery modal
-      window.history.pushState({ view: 'photos', photoId: photoId }, '');
+    if (photoId === null) {
+      // Closing the gallery detail view -> Go back in history
+      // This ensures consistent behavior with the browser back button
+      window.history.back();
+    } else {
+      const isAlreadyOpen = selectedPhoto !== null;
+      setSelectedPhoto(photoId);
+      
+      if (isAlreadyOpen) {
+        // Swiping between photos: Replace state to avoid cluttering history
+        window.history.replaceState({ view: 'photos', photoId: photoId }, '');
+      } else {
+        // Opening photo from grid: Push state
+        window.history.pushState({ view: 'photos', photoId: photoId }, '');
+      }
     }
   };
 
   const isDetailView = view === 'hymns' && currentHymn !== null;
 
-  // Dynamic Background Logic
   const getBackgroundImage = () => {
     if (view === 'hymns') {
       if (currentHymn) return 'empty.webp';
@@ -255,7 +273,6 @@ function App() {
             onPrev={handlePrevHymn}
             canNext={currentIndex < HYMNS.length - 1}
             canPrev={currentIndex > 0}
-            // Pass header setter
             onSetHeaderTitle={setHeaderTitle}
           />
         );
@@ -265,7 +282,8 @@ function App() {
           hymns={filteredHymns}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
-          onSelectHymn={handleSelectHymn} 
+          onSelectHymn={handleSelectHymn}
+          lastViewedHymnId={lastViewedHymnId} // Pass prop
         />
       );
     }
@@ -295,7 +313,7 @@ function App() {
       <Header 
         onBack={handleBack}
         showBack={view !== 'menu'}
-        customTitle={headerTitle} // Pass title to header
+        customTitle={headerTitle}
       />
 
       <main className="relative z-10 flex-1">

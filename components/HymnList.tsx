@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Search, ChevronLeft } from 'lucide-react';
 import { Hymn } from '../types';
 
@@ -7,10 +7,32 @@ interface HymnListProps {
   searchTerm: string;
   onSearchChange: (term: string) => void;
   onSelectHymn: (hymn: Hymn) => void;
+  lastViewedHymnId: number | null; // Added prop
 }
 
-export const HymnList: React.FC<HymnListProps> = ({ hymns, searchTerm, onSearchChange, onSelectHymn }) => {
+export const HymnList: React.FC<HymnListProps> = ({ 
+  hymns, 
+  searchTerm, 
+  onSearchChange, 
+  onSelectHymn,
+  lastViewedHymnId 
+}) => {
   
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Effect to scroll to the highlighted hymn
+  useEffect(() => {
+    if (lastViewedHymnId !== null) {
+      const element = document.getElementById(`hymn-card-${lastViewedHymnId}`);
+      if (element) {
+        // Small delay to ensure rendering
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
+    }
+  }, [lastViewedHymnId]);
+
   const highlightText = (text: string, highlight: string) => {
     if (!highlight.trim()) return text;
     
@@ -75,48 +97,62 @@ export const HymnList: React.FC<HymnListProps> = ({ hymns, searchTerm, onSearchC
             </div>
           </div>
         ) : (
-          hymns.map((hymn) => (
-            <div
-              key={hymn.id}
-              onClick={() => onSelectHymn(hymn)}
-              className="group relative bg-white/30 dark:bg-black/40 backdrop-blur-lg p-6 rounded-3xl border border-white/40 dark:border-white/5 shadow-sm hover:shadow-xl hover:bg-white/50 dark:hover:bg-black/60 hover:scale-[1.01] cursor-pointer transition-all duration-300"
-            >
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-4">
-                  <span className="flex items-center justify-center w-10 h-10 rounded-full bg-white/40 dark:bg-white/10 text-primary dark:text-blue-400 font-bold text-lg font-sans shadow-inner border border-white/20">
-                    {hymn.id}
-                  </span>
-                  <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-                    {highlightText(hymn.title, searchTerm)}
-                  </h3>
+          hymns.map((hymn) => {
+            const isHighlighted = hymn.id === lastViewedHymnId;
+            return (
+              <div
+                key={hymn.id}
+                id={`hymn-card-${hymn.id}`} // ID for scrolling
+                onClick={() => onSelectHymn(hymn)}
+                className={`group relative bg-white/30 dark:bg-black/40 backdrop-blur-lg p-6 rounded-3xl border shadow-sm hover:shadow-xl hover:bg-white/50 dark:hover:bg-black/60 hover:scale-[1.01] cursor-pointer transition-all duration-500 ${
+                  isHighlighted 
+                    ? 'border-amber-400/80 ring-1 ring-amber-400/50 shadow-amber-500/20' 
+                    : 'border-white/40 dark:border-white/5'
+                }`}
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-4">
+                    <span className={`flex items-center justify-center w-10 h-10 rounded-full font-bold text-lg font-sans shadow-inner border border-white/20 transition-colors ${
+                       isHighlighted 
+                       ? 'bg-amber-500 text-white' 
+                       : 'bg-white/40 dark:bg-white/10 text-primary dark:text-blue-400'
+                    }`}>
+                      {hymn.id}
+                    </span>
+                    <h3 className={`text-xl font-bold transition-colors ${
+                      isHighlighted ? 'text-amber-400' : 'text-zinc-900 dark:text-zinc-100'
+                    }`}>
+                      {highlightText(hymn.title, searchTerm)}
+                    </h3>
+                  </div>
+                  <div className="p-2 rounded-full bg-white/20 dark:bg-white/5 group-hover:bg-primary/20 dark:group-hover:bg-primary/20 transition-colors">
+                     <ChevronLeft className="text-zinc-500 dark:text-zinc-400 group-hover:text-primary transition-colors" size={20} />
+                  </div>
                 </div>
-                <div className="p-2 rounded-full bg-white/20 dark:bg-white/5 group-hover:bg-primary/20 dark:group-hover:bg-primary/20 transition-colors">
-                   <ChevronLeft className="text-zinc-500 dark:text-zinc-400 group-hover:text-primary transition-colors" size={20} />
-                </div>
+                
+                {/* Show snippet if lyrics matched */}
+                {searchTerm && (
+                   (function() {
+                      let pattern = '';
+                      for (const char of searchTerm) {
+                        if (['ا', 'أ', 'إ', 'آ'].includes(char)) pattern += '[اأإآ]';
+                        else if (['ي', 'ى'].includes(char)) pattern += '[يى]';
+                        else pattern += char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                      }
+                      const regex = new RegExp(pattern, 'i');
+                      return regex.test(hymn.lyrics);
+                   })()
+                ) && (
+                  <div className="mt-4 mr-14 p-3 rounded-xl bg-white/20 dark:bg-black/20 text-sm text-zinc-700 dark:text-zinc-300 line-clamp-2 leading-relaxed border border-white/10">
+                    {highlightText(
+                       hymn.lyrics,
+                       searchTerm
+                    )}
+                  </div>
+                )}
               </div>
-              
-              {/* Show snippet if lyrics matched */}
-              {searchTerm && (
-                 (function() {
-                    let pattern = '';
-                    for (const char of searchTerm) {
-                      if (['ا', 'أ', 'إ', 'آ'].includes(char)) pattern += '[اأإآ]';
-                      else if (['ي', 'ى'].includes(char)) pattern += '[يى]';
-                      else pattern += char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    }
-                    const regex = new RegExp(pattern, 'i');
-                    return regex.test(hymn.lyrics);
-                 })()
-              ) && (
-                <div className="mt-4 mr-14 p-3 rounded-xl bg-white/20 dark:bg-black/20 text-sm text-zinc-700 dark:text-zinc-300 line-clamp-2 leading-relaxed border border-white/10">
-                  {highlightText(
-                     hymn.lyrics,
-                     searchTerm
-                  )}
-                </div>
-              )}
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

@@ -147,8 +147,9 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
     let content = line;
     let manualTag = null;
 
-    // 1. Check for Manual Tags [R], [Y], [B], [E]
-    const tagMatch = line.match(/^\[([RYBE])\]/);
+    // 1. Check for Manual Tags [R], [Y], [B], [E], [P]
+    // Added 'P' to regex for Paragraph Spacer
+    const tagMatch = line.match(/^\[([RYBEP])\]/);
     if (tagMatch) {
       manualTag = tagMatch[1];
       // Remove tag from content
@@ -157,6 +158,9 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
 
     // 2. Logic (Manual Tag overrides heuristics)
     
+    // Spacer: Tag [P]
+    const isSpacer = manualTag === 'P';
+
     // English: Tag [E] or 3+ english letters
     const isEnglish = manualTag === 'E' || (manualTag === null && /[a-zA-Z]{3,}/.test(content));
 
@@ -169,7 +173,7 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
     // Verse: Tag [B] or starts with number
     const isVerse = manualTag === 'B' || (manualTag === null && /^\s*\(?\d+[\u0660-\u0669]?\)?[\-\.]/.test(content));
 
-    return { isEnglish, isChorusLabel, isChorusText, isVerse, content };
+    return { isEnglish, isChorusLabel, isChorusText, isVerse, isSpacer, content };
   };
 
   return (
@@ -246,8 +250,13 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
       <div className="flex-1 w-full max-w-3xl mx-auto p-6 mt-4">
         <div className="space-y-6 text-center bg-white/20 dark:bg-black/20 backdrop-blur-md rounded-[32px] p-8 border border-white/20 dark:border-white/5 shadow-lg">
           {lines.map((line, index) => {
-             const { isEnglish, isChorusLabel, isChorusText, isVerse, content } = getLineInfo(line);
+             const { isEnglish, isChorusLabel, isChorusText, isVerse, isSpacer, content } = getLineInfo(line);
              
+             // Render Spacer if [P] tag found
+             if (isSpacer) {
+               return <div key={index} className="h-8 w-full" aria-hidden="true" />;
+             }
+
              let textColorClass = "text-zinc-800 dark:text-zinc-100"; // Default
              if (isChorusLabel) textColorClass = "text-red-500 dark:text-red-400 font-black text-xl mt-6 mb-2";
              else if (isChorusText) textColorClass = "text-amber-600 dark:text-amber-400 font-extrabold";

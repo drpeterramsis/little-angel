@@ -105,13 +105,16 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   };
 
   const renderLineWithHighlights = (line: string) => {
+    // Strip markdown bold markers from display text
+    const cleanLine = line.replace(/^\s*\*\*/, '').replace(/\*\*\s*$/, '');
+
     const term = localSearch.trim();
-    if (!term) return line;
+    if (!term) return cleanLine;
 
     try {
       const patternString = getFlexibleRegex(term).source;
       const regex = new RegExp(`(${patternString})`, 'gi');
-      const parts = line.split(regex);
+      const parts = cleanLine.split(regex);
       
       return parts.map((part, i) => {
         if (i % 2 === 1) {
@@ -128,7 +131,7 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
         return <span key={i}>{part}</span>;
       });
     } catch (e) {
-      return line;
+      return cleanLine;
     }
   };
 
@@ -139,17 +142,47 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
     matchRefs.current = Array.from(elements) as HTMLElement[];
   }, [localSearch, lines]);
 
+  // Determine line style based on content and manual tags
+  const getLineInfo = (line: string) => {
+    let content = line;
+    let manualTag = null;
+
+    // 1. Check for Manual Tags [R], [Y], [B], [E]
+    const tagMatch = line.match(/^\[([RYBE])\]/);
+    if (tagMatch) {
+      manualTag = tagMatch[1];
+      // Remove tag from content
+      content = line.substring(tagMatch[0].length).trim();
+    }
+
+    // 2. Logic (Manual Tag overrides heuristics)
+    
+    // English: Tag [E] or 3+ english letters
+    const isEnglish = manualTag === 'E' || (manualTag === null && /[a-zA-Z]{3,}/.test(content));
+
+    // Chorus Header: Tag [R] or starts with 'القرار' etc.
+    const isChorusLabel = manualTag === 'R' || (manualTag === null && /^\s*(القرار|قرار|\(ق\))/.test(content));
+    
+    // Chorus Text: Tag [Y] or starts with ** or 'القرار' in text
+    const isChorusText = manualTag === 'Y' || (manualTag === null && (/^\s*\*\*/.test(content) || /^\s*القرار/.test(content)));
+    
+    // Verse: Tag [B] or starts with number
+    const isVerse = manualTag === 'B' || (manualTag === null && /^\s*\(?\d+[\u0660-\u0669]?\)?[\-\.]/.test(content));
+
+    return { isEnglish, isChorusLabel, isChorusText, isVerse, content };
+  };
+
   return (
     <div className="flex flex-col min-h-[calc(100vh-80px)] pb-64">
       
-      {/* Glass Sticky Controls - Updated top to top-20 (80px) to clear the header */}
+      {/* Glass Sticky Controls - sticky at top-20 to clear header */}
       <div className="sticky top-20 z-30 mx-4 mt-2 transition-all duration-300">
         <div className="max-w-3xl mx-auto bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-3xl p-3 shadow-xl">
           <div className="flex flex-col gap-2">
             
-            {/* Row 1: Title */}
-            <div className="flex items-center justify-center">
-              <h2 className="text-lg font-bold truncate text-zinc-900 dark:text-white drop-shadow-sm">{hymn.title}</h2>
+            {/* Row 1: Title - Updated: Bigger, Bolder, Light Blue */}
+            <div className="flex items-center justify-center py-2">
+              <h2 className="text-2xl sm:text-3xl font-black truncate text-blue-400 drop-shadow-md tracking-wide">{hymn.title}</h2>
             </div>
 
             {/* Row 2: Tools (Search + MatchNav + Font) */}
@@ -212,15 +245,31 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
       {/* Lyrics Content */}
       <div className="flex-1 w-full max-w-3xl mx-auto p-6 mt-4">
         <div className="space-y-6 text-center bg-white/20 dark:bg-black/20 backdrop-blur-md rounded-[32px] p-8 border border-white/20 dark:border-white/5 shadow-lg">
-          {lines.map((line, index) => (
-            <p 
-              key={index} 
-              className="font-bold leading-loose text-zinc-800 dark:text-zinc-100 font-sans transition-[font-size] duration-200 drop-shadow-sm"
-              style={{ fontSize: `${fontSize}px` }}
-            >
-              {renderLineWithHighlights(line)}
-            </p>
-          ))}
+          {lines.map((line, index) => {
+             const { isEnglish, isChorusLabel, isChorusText, isVerse, content } = getLineInfo(line);
+             
+             let textColorClass = "text-zinc-800 dark:text-zinc-100"; // Default
+             if (isChorusLabel) textColorClass = "text-red-500 dark:text-red-400 font-black text-xl mt-6 mb-2";
+             else if (isChorusText) textColorClass = "text-amber-600 dark:text-amber-400 font-extrabold";
+             else if (isVerse) textColorClass = "text-blue-600 dark:text-blue-300 font-bold mt-4";
+             else if (isEnglish) textColorClass = "text-zinc-200 font-medium";
+
+             const alignClass = isEnglish ? "text-left" : "text-center";
+             const fontClass = isEnglish ? "font-sans" : "font-sans"; 
+             const dir = isEnglish ? "ltr" : "rtl";
+
+             return (
+              <p 
+                key={index} 
+                dir={dir}
+                className={`${textColorClass} ${alignClass} ${fontClass} leading-loose transition-[font-size] duration-200 drop-shadow-sm`}
+                style={{ fontSize: isChorusLabel ? `${fontSize + 2}px` : `${fontSize}px` }}
+              >
+                {/* Use content (which has tags removed) instead of original line */}
+                {renderLineWithHighlights(content)}
+              </p>
+             );
+          })}
         </div>
       </div>
 

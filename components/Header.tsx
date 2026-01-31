@@ -8,8 +8,8 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onBack, showBack }) => {
   return (
-    // Updated: Fully transparent, removed background, border and shadow
-    <header className="sticky top-0 z-50 w-full bg-transparent transition-all duration-300">
+    // Updated: Added bg-black/30, backdrop-blur-lg, and border-b to blur content behind header
+    <header className="sticky top-0 z-50 w-full bg-black/30 backdrop-blur-lg border-b border-white/5 transition-all duration-300">
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         
         <div className="flex items-center gap-4 w-full">

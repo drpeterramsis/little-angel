@@ -6,13 +6,14 @@ import { HymnDetail } from './components/HymnDetail';
 import { IntroPage } from './components/IntroPage';
 import { MenuPage } from './components/MenuPage';
 import { ChoirMembers } from './components/ChoirMembers';
-import { VideoList } from './components/VideoList'; // Import VideoList
+import { VideoList } from './components/VideoList';
+import { PhotoGallery } from './components/PhotoGallery'; // Import PhotoGallery
 import { ScrollToTop } from './components/ScrollToTop';
 import { Hymn } from './types';
-import { HYMNS, CHOIR_VIDEOS } from './data'; // Import Video Data
+import { HYMNS, CHOIR_VIDEOS } from './data';
 
-// Added 'videos' to ViewState
-type ViewState = 'menu' | 'members' | 'hymns' | 'videos';
+// Added 'photos' to ViewState
+type ViewState = 'menu' | 'members' | 'hymns' | 'videos' | 'photos';
 
 function App() {
   const [showIntro, setShowIntro] = useState(true);
@@ -41,8 +42,11 @@ function App() {
       } else if (state.view === 'hymns') {
         setView('hymns');
         setCurrentHymn(null);
-      } else if (state.view === 'videos') { // Handle video view back
+      } else if (state.view === 'videos') {
         setView('videos');
+        setCurrentHymn(null);
+      } else if (state.view === 'photos') { // Handle photos view back
+        setView('photos');
         setCurrentHymn(null);
       } else if (state.view === 'detail') {
         setView('hymns');
@@ -85,6 +89,11 @@ function App() {
   const goToVideos = () => {
     setView('videos');
     window.history.pushState({ view: 'videos' }, '');
+  };
+
+  const goToPhotos = () => {
+    setView('photos');
+    window.history.pushState({ view: 'photos' }, '');
   };
 
   // Filter logic for the LIST view with flexible Arabic matching
@@ -164,9 +173,9 @@ function App() {
       // Hymn List View
       return 'music.webp';
     }
-    // New background logic for videos if needed, or share with members/menu
-    if (view === 'videos') {
-      return 'music.webp'; // Reusing music background for video list
+    // Shared background for videos and photos
+    if (view === 'videos' || view === 'photos') {
+      return 'music.webp'; 
     }
     // Default for Menu and Members
     return 'background2.webp';
@@ -182,7 +191,8 @@ function App() {
         <MenuPage 
           onSelectLittleAngel={goToMembers} 
           onSelectHymns={goToHymns}
-          onSelectVideos={goToVideos} 
+          onSelectVideos={goToVideos}
+          onSelectPhotos={goToPhotos}
         />
       );
     }
@@ -193,6 +203,10 @@ function App() {
 
     if (view === 'videos') {
       return <VideoList videos={CHOIR_VIDEOS} />;
+    }
+
+    if (view === 'photos') {
+      return <PhotoGallery />;
     }
 
     if (view === 'hymns') {

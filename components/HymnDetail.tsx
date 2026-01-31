@@ -31,6 +31,10 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   
   const matchRefs = useRef<(HTMLElement | null)[]>([]);
   const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  // Refs for Swipe Gesture
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   const lines = hymn.lyrics.split('\n');
 
@@ -77,6 +81,40 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
       }, 5000); 
     }
   }, [matchCount]);
+
+  // Swipe Handlers
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+    touchStartY.current = e.targetTouches[0].clientY;
+  };
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    
+    const diffX = touchStartX.current - touchEndX;
+    const diffY = touchStartY.current - touchEndY;
+
+    // Check if horizontal swipe is dominant (more horizontal than vertical movement)
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+       // Threshold of 50px
+       if (Math.abs(diffX) > 50) {
+         // Swipe Left (diffX > 0) -> Next
+         if (diffX > 0 && canNext) {
+           onNext();
+         }
+         // Swipe Right (diffX < 0) -> Prev
+         if (diffX < 0 && canPrev) {
+           onPrev();
+         }
+       }
+    }
+    
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
 
   const getFlexibleRegex = (term: string) => {
     let pattern = '';
@@ -201,7 +239,11 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
     : "flex flex-col min-h-[calc(100vh-80px)] pb-64 transition-all duration-300";
 
   return (
-    <div className={rootClasses}>
+    <div 
+      className={rootClasses}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
       
       {/* Glass Sticky Controls - Visible in both modes, position adjusts */}
       {/* Normal: top-20 (below header), FullScreen: top-4 (top of screen) */}
@@ -289,6 +331,41 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
         </div>
       </div>
 
+      {/* Side Navigation Buttons (Fixed Arrows) */}
+      {/* PREV Button (Right Side for RTL context visually, or logical Previous) */}
+      {/* Note: In RTL app, 'Previous' usually means going 'Back', which is an arrow to the Right?
+          Actually, standard audio/slideshow: 
+          [ < Next ]  Content  [ Prev > ] in some RTL layouts.
+          However, let's stick to the visual arrows:
+          ChevronRight ( > ) : Usually 'Next' in LTR, 'Prev' in RTL? 
+          Let's use the same icons as the text buttons had:
+          Old Prev button used <ChevronRight />.
+          Old Next button used <ChevronLeft />.
+      */}
+      
+      {/* Right Side Button -> Previous */}
+      {canPrev && (
+        <button
+          onClick={onPrev}
+          className="fixed right-2 top-1/2 -translate-y-1/2 z-[60] p-4 rounded-full bg-black/20 hover:bg-black/50 text-white backdrop-blur-md transition-all border border-white/10 shadow-lg hover:scale-110 active:scale-95"
+          aria-label="السابق"
+        >
+          <ChevronRight size={28} />
+        </button>
+      )}
+
+      {/* Left Side Button -> Next */}
+      {canNext && (
+        <button
+          onClick={onNext}
+          className="fixed left-2 top-1/2 -translate-y-1/2 z-[60] p-4 rounded-full bg-black/20 hover:bg-black/50 text-white backdrop-blur-md transition-all border border-white/10 shadow-lg hover:scale-110 active:scale-95"
+          aria-label="التالي"
+        >
+          <ChevronLeft size={28} />
+        </button>
+      )}
+
+
       {/* Lyrics Content */}
       <div className={`flex-1 w-full max-w-3xl mx-auto p-6 ${isFullScreen ? 'pt-6' : 'mt-4'}`}>
         
@@ -341,39 +418,6 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
           })}
         </div>
       </div>
-
-      {/* Sticky Bottom Navigation - Hidden in Full Screen */}
-      {!isFullScreen && (
-        <div className="fixed bottom-10 left-0 right-0 p-4 z-50">
-           <div className="max-w-3xl mx-auto flex items-center justify-between gap-4 bg-white/60 dark:bg-black/60 backdrop-blur-2xl border border-white/30 dark:border-white/10 rounded-2xl p-2 shadow-2xl">
-              <button
-                onClick={onPrev}
-                disabled={!canPrev}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
-                  canPrev 
-                  ? 'bg-white/40 dark:bg-white/10 text-zinc-900 dark:text-white hover:bg-white/60 dark:hover:bg-white/20 border border-white/20' 
-                  : 'bg-transparent text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
-                }`}
-              >
-                <ChevronRight size={20} />
-                <span>السابق</span>
-              </button>
-              
-              <button
-                onClick={onNext}
-                disabled={!canNext}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
-                  canNext 
-                  ? 'bg-primary/90 text-white hover:bg-primary shadow-lg shadow-primary/30 border border-white/20' 
-                  : 'bg-transparent text-zinc-400 dark:text-zinc-600 cursor-not-allowed'
-                }`}
-              >
-                <span>التالي</span>
-                <ChevronLeft size={20} />
-              </button>
-           </div>
-        </div>
-      )}
 
     </div>
   );

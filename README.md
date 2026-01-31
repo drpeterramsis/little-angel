@@ -4,6 +4,11 @@ Application for the Little Angel Choir - Naghamat Ajyal Concert.
 
 ## Updates
 
+### Version 1.0.40
+- **Hymn Ordering**: 
+    - The hymn list and navigation now strictly follow the Hymn ID number. 
+    - This ensures correct sequencing (1, 2, 3...) regardless of the order in which data was entered.
+
 ### Version 1.0.39
 - **Social Sharing Metadata**: 
     - Added Open Graph (`og:image`, `og:title`) and Favicon tags to `index.html`.

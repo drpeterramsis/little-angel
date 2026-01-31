@@ -14,6 +14,10 @@ import { HYMNS, CHOIR_VIDEOS } from './data';
 
 type ViewState = 'menu' | 'members' | 'hymns' | 'videos' | 'photos';
 
+// Create a sorted copy of HYMNS based on ID to ensure correct order (1, 2, 3...)
+// This fixes issues where data might be entered out of numerical order in data.ts
+const SORTED_HYMNS = [...HYMNS].sort((a, b) => a.id - b.id);
+
 function App() {
   const [showIntro, setShowIntro] = useState(true);
   
@@ -67,7 +71,8 @@ function App() {
         }
       } else if (state.view === 'detail') {
         setView('hymns');
-        const hymn = HYMNS.find(h => h.id === state.hymnId);
+        // Find hymn from sorted list (though find works regardless of order)
+        const hymn = SORTED_HYMNS.find(h => h.id === state.hymnId);
         if (hymn) {
           setCurrentHymn(hymn);
           setLastViewedHymnId(hymn.id); // Ensure ID is tracked if we navigated forward somehow
@@ -121,7 +126,7 @@ function App() {
   // --- HYMNS LOGIC ---
   const filteredHymns = useMemo(() => {
     const term = searchTerm.trim();
-    if (!term) return HYMNS;
+    if (!term) return SORTED_HYMNS; // Return sorted list by default
 
     let pattern = '';
     for (const char of term) {
@@ -136,13 +141,13 @@ function App() {
 
     try {
       const regex = new RegExp(pattern, 'i');
-      return HYMNS.filter(hymn => 
+      return SORTED_HYMNS.filter(hymn => 
         regex.test(hymn.title) || 
         regex.test(hymn.lyrics)
       );
     } catch (e) {
       const lowerTerm = term.toLowerCase();
-      return HYMNS.filter(hymn => 
+      return SORTED_HYMNS.filter(hymn => 
         hymn.title.toLowerCase().includes(lowerTerm) || 
         hymn.lyrics.toLowerCase().includes(lowerTerm)
       );
@@ -151,7 +156,7 @@ function App() {
 
   const currentIndex = useMemo(() => {
     if (!currentHymn) return -1;
-    return HYMNS.findIndex(h => h.id === currentHymn.id);
+    return SORTED_HYMNS.findIndex(h => h.id === currentHymn.id);
   }, [currentHymn]);
 
   const handleSelectHymn = (hymn: Hymn) => {
@@ -162,8 +167,9 @@ function App() {
   };
 
   const handleNextHymn = () => {
-    if (currentIndex !== -1 && currentIndex < HYMNS.length - 1) {
-      const nextHymn = HYMNS[currentIndex + 1];
+    // Navigation now respects the sorted order (ID order)
+    if (currentIndex !== -1 && currentIndex < SORTED_HYMNS.length - 1) {
+      const nextHymn = SORTED_HYMNS[currentIndex + 1];
       setCurrentHymn(nextHymn);
       setLastViewedHymnId(nextHymn.id);
       window.history.replaceState({ view: 'detail', hymnId: nextHymn.id }, '');
@@ -172,8 +178,9 @@ function App() {
   };
 
   const handlePrevHymn = () => {
+    // Navigation now respects the sorted order (ID order)
     if (currentIndex > 0) {
-      const prevHymn = HYMNS[currentIndex - 1];
+      const prevHymn = SORTED_HYMNS[currentIndex - 1];
       setCurrentHymn(prevHymn);
       setLastViewedHymnId(prevHymn.id);
       window.history.replaceState({ view: 'detail', hymnId: prevHymn.id }, '');
@@ -271,7 +278,7 @@ function App() {
             onBack={handleBack}
             onNext={handleNextHymn}
             onPrev={handlePrevHymn}
-            canNext={currentIndex < HYMNS.length - 1}
+            canNext={currentIndex < SORTED_HYMNS.length - 1}
             canPrev={currentIndex > 0}
             onSetHeaderTitle={setHeaderTitle}
           />

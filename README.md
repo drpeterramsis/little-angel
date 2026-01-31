@@ -4,6 +4,11 @@ Application for the Little Angel Choir - Naghamat Ajyal Concert.
 
 ## Updates
 
+### Version 1.0.39
+- **Social Sharing Metadata**: 
+    - Added Open Graph (`og:image`, `og:title`) and Favicon tags to `index.html`.
+    - Sharing the app link on social media (WhatsApp, Facebook, etc.) will now display the `logo.webp` as the preview image.
+
 ### Version 1.0.38
 - **Photo Gallery Navigation**: 
     - Closing an enlarged photo (via button or browser back) now reliably returns to the gallery grid without exiting the gallery section.

@@ -53,9 +53,9 @@ export const IntroPage: React.FC<IntroPageProps> = ({ onEnter }) => {
         }`}
       >
         <div className="w-48 h-48 sm:w-64 sm:h-64 rounded-full flex items-center justify-center drop-shadow-2xl animate-fade-in">
-           {/* Note: Uses existing logo.webp */}
+           {/* Note: Updated to logo.png */}
            <img 
-             src="logo.webp" 
+             src="logo.png" 
              alt="Little Angel Logo" 
              className="w-full h-full object-contain" 
            />
@@ -94,7 +94,7 @@ export const IntroPage: React.FC<IntroPageProps> = ({ onEnter }) => {
 
             {/* Version Number */}
             <div className="text-[10px] text-zinc-400 font-medium">
-              v1.0.37
+              v1.0.41
             </div>
          </div>
       </div>

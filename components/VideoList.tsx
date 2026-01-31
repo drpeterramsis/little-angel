@@ -78,7 +78,7 @@ export const VideoList: React.FC<VideoListProps> = ({ videos, selectedVideo, onS
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {videos.map((video) => {
           const videoId = getYoutubeId(video.link);
-          const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : 'logo.webp';
+          const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : 'logo.png';
 
           return (
             <button 

@@ -4,6 +4,12 @@ Application for the Little Angel Choir - Naghamat Ajyal Concert.
 
 ## Updates
 
+### Version 1.0.41
+- **Metadata Fix**: 
+    - Switched from `logo.webp` to `logo.png` for all app icons and metadata images. This format is much more reliable for social media sharing (WhatsApp, Facebook, etc.).
+    - Updated `Header`, `IntroPage`, and `VideoList` components to reference `logo.png`.
+    - **Note**: You must convert your `logo.webp` to `logo.png` and add it to the project root.
+
 ### Version 1.0.40
 - **Hymn Ordering**: 
     - The hymn list and navigation now strictly follow the Hymn ID number. 

@@ -43,7 +43,7 @@ export const Header: React.FC<HeaderProps> = ({ onBack, showBack, customTitle })
 
             <div className="relative w-12 h-12 rounded-full overflow-hidden border border-white/20 bg-white/5 flex items-center justify-center shadow-lg backdrop-blur-md">
                <img 
-                src="logo.webp" 
+                src="logo.png" 
                 alt="شعار الملاك الصغير" 
                 className="w-full h-full object-cover"
                 onError={(e) => {

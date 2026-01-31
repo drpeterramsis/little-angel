@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, ChevronUp, ChevronDown, ChevronRight, ChevronLeft, Minus, Plus } from 'lucide-react';
+import { Search, ChevronUp, ChevronDown, ChevronRight, ChevronLeft, Minus, Plus, Type } from 'lucide-react';
 import { Hymn } from '../types';
 
 interface HymnDetailProps {
@@ -10,6 +10,8 @@ interface HymnDetailProps {
   canNext: boolean;
   canPrev: boolean;
 }
+
+const FONTS = ['Cairo', 'Amiri', 'Tajawal'];
 
 export const HymnDetail: React.FC<HymnDetailProps> = ({ 
   hymn, 
@@ -23,6 +25,8 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   const [matchCount, setMatchCount] = useState(0);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(-1);
   const [fontSize, setFontSize] = useState(24); 
+  // Updated: Default to index 1 (Amiri) instead of 0 (Cairo)
+  const [fontIndex, setFontIndex] = useState(1);
   
   const matchRefs = useRef<(HTMLElement | null)[]>([]);
   const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -30,9 +34,15 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   const lines = hymn.lyrics.split('\n');
 
   useEffect(() => {
+    // Load Size
     const savedSize = localStorage.getItem('hymn-font-size');
     if (savedSize) {
       setFontSize(parseInt(savedSize, 10));
+    }
+    // Load Font Family
+    const savedFont = localStorage.getItem('hymn-font-index');
+    if (savedFont) {
+      setFontIndex(parseInt(savedFont, 10));
     }
   }, []);
 
@@ -40,6 +50,12 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
     const clamped = Math.max(16, Math.min(64, newSize));
     setFontSize(clamped);
     localStorage.setItem('hymn-font-size', clamped.toString());
+  };
+
+  const cycleFont = () => {
+    const next = (fontIndex + 1) % FONTS.length;
+    setFontIndex(next);
+    localStorage.setItem('hymn-font-index', next.toString());
   };
 
   const handleNavigation = useCallback((index: number) => {
@@ -227,6 +243,15 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
 
                {/* Font Controls - Beside Search */}
                <div className="flex items-center gap-1 bg-white/30 dark:bg-white/10 rounded-lg p-0.5 border border-white/20 flex-shrink-0">
+                {/* Font Family Switcher */}
+                <button 
+                  onClick={cycleFont}
+                  className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200 transition-colors border-l border-white/10 ml-0.5"
+                  title="تغيير الخط"
+                >
+                  <Type size={14} />
+                </button>
+
                 <button 
                   onClick={() => updateFontSize(fontSize - 2)}
                   className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200 transition-colors"
@@ -269,15 +294,20 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
              else if (isEnglish) textColorClass = "text-zinc-200 font-medium";
 
              const alignClass = isEnglish ? "text-left" : "text-center";
-             const fontClass = isEnglish ? "font-sans" : "font-sans"; 
              const dir = isEnglish ? "ltr" : "rtl";
+             
+             // Dynamic font family style
+             const fontFamilyStyle = {
+                fontFamily: FONTS[fontIndex],
+                fontSize: isChorusLabel ? `${fontSize + 2}px` : `${fontSize}px`
+             };
 
              return (
               <p 
                 key={index} 
                 dir={dir}
-                className={`${textColorClass} ${alignClass} ${fontClass} leading-loose transition-[font-size] duration-200 drop-shadow-sm`}
-                style={{ fontSize: isChorusLabel ? `${fontSize + 2}px` : `${fontSize}px` }}
+                className={`${textColorClass} ${alignClass} leading-loose transition-[font-size] duration-200 drop-shadow-sm`}
+                style={fontFamilyStyle}
               >
                 {/* Use content (which has tags removed) instead of original line */}
                 {renderLineWithHighlights(content)}

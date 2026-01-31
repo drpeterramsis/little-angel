@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { Image, X, ZoomIn, ChevronRight, ChevronLeft } from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
+import { Image, ZoomIn, ChevronRight, ChevronLeft, ArrowRight } from 'lucide-react';
 
 interface PhotoGalleryProps {
   selectedPhoto: number | null;
@@ -13,9 +13,22 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ selectedPhoto, onSel
   // Refs for Swipe Gesture
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
+  
+  // Ref for horizontal scroll strip
+  const scrollStripRef = useRef<HTMLDivElement>(null);
 
   // Function to build image source path
   const getPhotoSrc = (index: number) => `choir (${index}).webp`;
+
+  // Auto-scroll the timeline when selected photo changes
+  useEffect(() => {
+    if (selectedPhoto && scrollStripRef.current) {
+      const selectedThumb = document.getElementById(`thumb-${selectedPhoto}`);
+      if (selectedThumb) {
+        selectedThumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    }
+  }, [selectedPhoto]);
 
   // Handle Next/Prev
   const handleNext = (e?: React.MouseEvent) => {
@@ -64,6 +77,86 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ selectedPhoto, onSel
     touchStartY.current = null;
   };
 
+  // --- DETAIL VIEW ---
+  if (selectedPhoto !== null) {
+    return (
+      <div className="flex flex-col h-[calc(100vh-100px)] animate-fade-in bg-black">
+        {/* Top Bar for Back Navigation */}
+        <div className="p-4 bg-black z-10 flex items-center justify-between">
+           <button 
+              onClick={() => onSelectPhoto(null)}
+              className="flex items-center gap-2 text-zinc-300 hover:text-white transition-colors bg-white/10 px-4 py-2 rounded-full border border-white/10"
+            >
+              <ArrowRight size={18} />
+              <span>عودة للمعرض</span>
+            </button>
+            <div className="text-white/70 font-mono text-sm">
+              {selectedPhoto} / 61
+            </div>
+        </div>
+
+        {/* Main Image Area - Responsive container */}
+        <div 
+           className="flex-1 relative w-full overflow-hidden bg-black flex items-center justify-center touch-none"
+           onTouchStart={onTouchStart}
+           onTouchEnd={onTouchEnd}
+        >
+           {/* Navigation Arrows for Desktop */}
+           {selectedPhoto > 1 && (
+              <button 
+                 onClick={handlePrev}
+                 className="absolute left-4 z-20 p-3 rounded-full bg-black/40 text-white hover:bg-black/70 border border-white/10 hidden sm:flex"
+              >
+                <ChevronLeft size={32} />
+              </button>
+           )}
+           {selectedPhoto < 61 && (
+              <button 
+                 onClick={handleNext}
+                 className="absolute right-4 z-20 p-3 rounded-full bg-black/40 text-white hover:bg-black/70 border border-white/10 hidden sm:flex"
+              >
+                <ChevronRight size={32} />
+              </button>
+           )}
+
+           {/* The Image */}
+           <img 
+              key={selectedPhoto} // Key forces re-render/animation on change
+              src={getPhotoSrc(selectedPhoto)}
+              alt={`Choir Full ${selectedPhoto}`}
+              className="max-w-full max-h-full object-contain pointer-events-none select-none drop-shadow-2xl animate-fade-in"
+              draggable={false}
+           />
+        </div>
+
+        {/* Timeline Scroll Strip */}
+        <div 
+          ref={scrollStripRef}
+          className="h-24 w-full bg-zinc-900/90 border-t border-white/10 overflow-x-auto flex items-center gap-2 px-4 py-2 custom-scrollbar shrink-0"
+        >
+           {photos.map((index) => (
+             <div 
+               key={index}
+               id={`thumb-${index}`}
+               onClick={() => onSelectPhoto(index)}
+               className={`relative h-16 aspect-square rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-300 border-2 ${
+                 selectedPhoto === index ? 'border-amber-400 scale-110 z-10' : 'border-transparent opacity-60 hover:opacity-100'
+               }`}
+             >
+                <img 
+                  src={getPhotoSrc(index)} 
+                  alt={`Thumb ${index}`} 
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+             </div>
+           ))}
+        </div>
+      </div>
+    );
+  }
+
+  // --- GRID VIEW ---
   return (
     <div className="w-full max-w-6xl mx-auto p-4 pb-24 animate-fade-in">
       
@@ -106,65 +199,6 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ selectedPhoto, onSel
           </div>
         ))}
       </div>
-
-      {/* Lightbox Modal */}
-      {selectedPhoto !== null && (
-        <div 
-          className="fixed inset-0 z-[150] bg-black flex items-center justify-center animate-fade-in"
-          onClick={() => onSelectPhoto(null)}
-          onTouchStart={onTouchStart}
-          onTouchEnd={onTouchEnd}
-        >
-          {/* Close Button */}
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelectPhoto(null);
-            }}
-            className="absolute top-4 right-4 p-3 rounded-full bg-black/50 text-white hover:bg-black/80 transition-colors border border-white/20 z-[160]"
-          >
-            <X size={28} />
-          </button>
-
-          {/* Navigation Arrows (Desktop/Helper) */}
-          {selectedPhoto > 1 && (
-            <button 
-               onClick={handlePrev}
-               className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/40 text-white hover:bg-black/70 border border-white/10 z-[160] hidden sm:flex"
-            >
-              <ChevronLeft size={32} />
-            </button>
-          )}
-
-          {selectedPhoto < 61 && (
-            <button 
-               onClick={handleNext}
-               className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/40 text-white hover:bg-black/70 border border-white/10 z-[160] hidden sm:flex"
-            >
-              <ChevronRight size={32} />
-            </button>
-          )}
-
-          {/* Image Container - Fit Screen, No Scroll */}
-          <div 
-            className="relative w-full h-full p-4 flex items-center justify-center"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking image area
-          >
-            <img 
-              src={getPhotoSrc(selectedPhoto)} 
-              alt={`Choir Full ${selectedPhoto}`} 
-              className="max-w-full max-h-full object-contain drop-shadow-2xl select-none"
-              draggable={false}
-            />
-            
-            {/* Index Counter */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/50 px-4 py-1 rounded-full text-white/80 text-sm font-mono border border-white/10">
-               {selectedPhoto} / 61
-            </div>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 };

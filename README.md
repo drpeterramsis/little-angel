@@ -4,6 +4,14 @@ Application for the Little Angel Choir - Naghamat Ajyal Concert.
 
 ## Updates
 
+### Version 1.0.37
+- **Hymn Details UI**: 
+    - Implemented dynamic header title: The main header now displays the current hymn's title when the hymn controls are hidden during scroll, effectively maximizing screen real estate while keeping context.
+- **Photo Gallery UX**: 
+    - Redesigned photo viewing experience. Instead of a popup modal, the gallery now transitions to a dedicated "Detail View" page.
+    - Detail View features a large, fit-to-screen main image area and a scrollable timeline strip of thumbnails at the bottom for easy navigation.
+    - Fixed scrolling issues ensuring the image is always fully visible.
+
 ### Version 1.0.36
 - **Photo Gallery**: 
     - Added swipe gesture support (Right-to-Left for Next, consistent with Arabic flow).

@@ -9,7 +9,7 @@ export const Footer: React.FC = () => {
       <div className="flex flex-row items-center gap-3 text-xs sm:text-sm text-zinc-300 font-sans font-medium drop-shadow-md opacity-90">
         <span>Carlos Peter Ramsis © 2026</span>
         <span className="text-zinc-500">•</span>
-        <span>v1.0.36 All Rights Reserved</span>
+        <span>v1.0.37 All Rights Reserved</span>
       </div>
     </footer>
   );

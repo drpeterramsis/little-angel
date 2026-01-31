@@ -20,6 +20,9 @@ function App() {
   // Navigation State
   const [view, setView] = useState<ViewState>('menu');
 
+  // Header State
+  const [headerTitle, setHeaderTitle] = useState<string | null>(null);
+
   // Content State
   const [searchTerm, setSearchTerm] = useState('');
   const [currentHymn, setCurrentHymn] = useState<Hymn | null>(null);
@@ -29,6 +32,9 @@ function App() {
   // Handle Browser Back Button (PopState)
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
+      // Reset header title on navigation
+      setHeaderTitle(null);
+
       // If we are showing intro, ignore history changes or just stay there
       if (showIntro) return;
 
@@ -79,6 +85,7 @@ function App() {
 
   // Back Button Logic (UI Button or Logo Click)
   const handleBack = useCallback(() => {
+    setHeaderTitle(null); // Ensure title resets
     if (view === 'menu') return;
     window.history.back();
   }, [view]);
@@ -248,6 +255,8 @@ function App() {
             onPrev={handlePrevHymn}
             canNext={currentIndex < HYMNS.length - 1}
             canPrev={currentIndex > 0}
+            // Pass header setter
+            onSetHeaderTitle={setHeaderTitle}
           />
         );
       }
@@ -286,6 +295,7 @@ function App() {
       <Header 
         onBack={handleBack}
         showBack={view !== 'menu'}
+        customTitle={headerTitle} // Pass title to header
       />
 
       <main className="relative z-10 flex-1">

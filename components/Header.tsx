@@ -4,9 +4,10 @@ import { ArrowRight } from 'lucide-react';
 interface HeaderProps {
   onBack: () => void;
   showBack: boolean;
+  customTitle?: string | null; // Added optional custom title
 }
 
-export const Header: React.FC<HeaderProps> = ({ onBack, showBack }) => {
+export const Header: React.FC<HeaderProps> = ({ onBack, showBack, customTitle }) => {
   return (
     // Updated: Added bg-black/30, backdrop-blur-lg, and border-b to blur content behind header
     <header className="sticky top-0 z-50 w-full bg-black/30 backdrop-blur-lg border-b border-white/5 transition-all duration-300">
@@ -29,8 +30,15 @@ export const Header: React.FC<HeaderProps> = ({ onBack, showBack }) => {
             className="flex items-center gap-3 select-none flex-1 justify-end" 
           >
             <div className="flex flex-col items-end -space-y-0.5">
-              <h1 className="text-xl font-black tracking-tight text-white font-sans drop-shadow-md">Little angel</h1>
-              <span className="text-[11px] font-bold text-amber-400 opacity-90 tracking-wide">حفل نغمة أجيال</span>
+              {/* Dynamic Title: Shows customTitle if provided, otherwise defaults to Little angel */}
+              <h1 className={`font-black tracking-tight text-white font-sans drop-shadow-md transition-all duration-300 ${customTitle ? 'text-lg sm:text-xl text-amber-400' : 'text-xl'}`}>
+                {customTitle || "Little angel"}
+              </h1>
+              
+              {/* Subtitle - Hide if custom title is active to save space/reduce clutter, or keep based on preference. Keeping for now but slightly fading if custom. */}
+              <span className={`text-[11px] font-bold opacity-90 tracking-wide transition-opacity duration-300 ${customTitle ? 'text-zinc-400' : 'text-amber-400'}`}>
+                {customTitle ? "الملاك الصغير" : "حفل نغمة أجيال"}
+              </span>
             </div>
 
             <div className="relative w-12 h-12 rounded-full overflow-hidden border border-white/20 bg-white/5 flex items-center justify-center shadow-lg backdrop-blur-md">

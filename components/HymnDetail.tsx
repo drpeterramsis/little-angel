@@ -9,6 +9,7 @@ interface HymnDetailProps {
   onPrev: () => void;
   canNext: boolean;
   canPrev: boolean;
+  onSetHeaderTitle?: (title: string | null) => void; // Added prop for changing header title
 }
 
 const FONTS = ['Cairo', 'Amiri', 'Tajawal'];
@@ -19,7 +20,8 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   onNext,
   onPrev,
   canNext,
-  canPrev
+  canPrev,
+  onSetHeaderTitle
 }) => {
   const [localSearch, setLocalSearch] = useState('');
   const [matchCount, setMatchCount] = useState(0);
@@ -80,6 +82,26 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
       }
     };
   }, [isFullScreen]);
+
+  // Handle Header Title Change based on ShowControls
+  useEffect(() => {
+    if (onSetHeaderTitle) {
+      if (!showControls) {
+        // Controls hidden -> Show Hymn Title in Header
+        onSetHeaderTitle(hymn.title);
+      } else {
+        // Controls visible -> Reset Header (Little Angel)
+        onSetHeaderTitle(null);
+      }
+    }
+  }, [showControls, hymn.title, onSetHeaderTitle]);
+
+  // Cleanup header title on unmount
+  useEffect(() => {
+    return () => {
+      if (onSetHeaderTitle) onSetHeaderTitle(null);
+    };
+  }, [onSetHeaderTitle]);
 
   // Click handler for text area to show controls
   const handleContentClick = () => {

@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Image, X, ZoomIn } from 'lucide-react';
 
-export const PhotoGallery: React.FC = () => {
+interface PhotoGalleryProps {
+  selectedPhoto: number | null;
+  onSelectPhoto: (id: number | null) => void;
+}
+
+export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ selectedPhoto, onSelectPhoto }) => {
   // Generate array of 61 image indices
   const photos = Array.from({ length: 61 }, (_, i) => i + 1);
-  const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
 
   // Function to build image source path
-  // Filenames are "choir (1).webp" ... "choir (61).webp"
   const getPhotoSrc = (index: number) => `choir (${index}).webp`;
 
   return (
@@ -27,7 +30,7 @@ export const PhotoGallery: React.FC = () => {
         {photos.map((index) => (
           <div 
             key={index}
-            onClick={() => setSelectedPhoto(index)}
+            onClick={() => onSelectPhoto(index)}
             className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer border border-white/10 bg-white/5 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] hover:z-10"
           >
             {/* Image */}
@@ -37,7 +40,6 @@ export const PhotoGallery: React.FC = () => {
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               loading="lazy"
               onError={(e) => {
-                // Fallback if image missing
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.parentElement!.classList.add('flex', 'items-center', 'justify-center', 'bg-zinc-800');
                 e.currentTarget.parentElement!.innerHTML = '<span class="text-xs text-zinc-500">Image not found</span>';
@@ -57,24 +59,29 @@ export const PhotoGallery: React.FC = () => {
       {/* Lightbox Modal */}
       {selectedPhoto !== null && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 animate-fade-in"
-          onClick={() => setSelectedPhoto(null)}
+          className="fixed inset-0 z-[150] bg-black flex items-center justify-center animate-fade-in"
+          onClick={() => onSelectPhoto(null)}
         >
+          {/* Close Button */}
           <button 
-            onClick={() => setSelectedPhoto(null)}
-            className="absolute top-4 right-4 p-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors border border-white/10 z-[101]"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelectPhoto(null);
+            }}
+            className="absolute top-4 right-4 p-3 rounded-full bg-black/50 text-white hover:bg-black/80 transition-colors border border-white/20 z-[160]"
           >
             <X size={28} />
           </button>
 
+          {/* Image Container - Fit Screen, No Scroll */}
           <div 
-            className="relative max-w-full max-h-full rounded-lg overflow-hidden shadow-2xl"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking image
+            className="relative w-full h-full p-4 flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking image area
           >
             <img 
               src={getPhotoSrc(selectedPhoto)} 
               alt={`Choir Full ${selectedPhoto}`} 
-              className="max-w-full max-h-[85vh] object-contain rounded-md"
+              className="max-w-full max-h-full object-contain drop-shadow-2xl"
             />
           </div>
         </div>

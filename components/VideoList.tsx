@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { PlayCircle, PauseCircle, Film } from 'lucide-react';
+import React from 'react';
+import { PlayCircle, Film, ArrowRight } from 'lucide-react';
 import { ChoirVideo } from '../types';
 
 interface VideoListProps {
   videos: ChoirVideo[];
+  selectedVideo: ChoirVideo | null;
+  onSelectVideo: (video: ChoirVideo | null) => void;
 }
 
-export const VideoList: React.FC<VideoListProps> = ({ videos }) => {
-  // State to track the currently playing video
-  const [currentVideo, setCurrentVideo] = useState<ChoirVideo>(videos[0]);
-  const [isPlaying, setIsPlaying] = useState(false);
+export const VideoList: React.FC<VideoListProps> = ({ videos, selectedVideo, onSelectVideo }) => {
 
   // Helper to extract YouTube ID
   const getYoutubeId = (url: string) => {
@@ -18,102 +17,96 @@ export const VideoList: React.FC<VideoListProps> = ({ videos }) => {
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
-  const currentVideoId = getYoutubeId(currentVideo.link);
+  // --- PLAYER VIEW ---
+  if (selectedVideo) {
+    const videoId = getYoutubeId(selectedVideo.link);
+    
+    return (
+      <div className="w-full max-w-5xl mx-auto p-4 pb-20 animate-fade-in flex flex-col h-[calc(100vh-100px)]">
+         {/* Internal Back Button for Clarity (Browser back also works) */}
+         <div className="mb-4">
+            <button 
+              onClick={() => onSelectVideo(null)}
+              className="flex items-center gap-2 text-zinc-300 hover:text-white transition-colors bg-black/40 px-4 py-2 rounded-full border border-white/10"
+            >
+              <ArrowRight size={18} />
+              <span>عودة للقائمة</span>
+            </button>
+         </div>
 
+         {/* Player Container - Fill available space */}
+         <div className="w-full flex-1 bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10 relative">
+            {videoId ? (
+              <iframe 
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0`}
+                title={selectedVideo.title}
+                className="w-full h-full absolute inset-0"
+                frameBorder="0"
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-zinc-900">
+                <p className="text-zinc-500">فشل تحميل الفيديو</p>
+              </div>
+            )}
+         </div>
+
+         {/* Video Info */}
+         <div className="mt-4 p-4 bg-white/10 dark:bg-black/40 backdrop-blur-md rounded-2xl border border-white/5">
+            <h2 className="text-xl sm:text-2xl font-bold text-white">{selectedVideo.title}</h2>
+         </div>
+      </div>
+    );
+  }
+
+  // --- LIST VIEW ---
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 pb-24 animate-fade-in flex flex-col gap-6">
+    <div className="w-full max-w-4xl mx-auto p-4 pb-24 animate-fade-in">
       
       {/* Header */}
-      <div className="text-center bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-3xl p-4 border border-white/20 dark:border-white/5 w-full">
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white mb-1 drop-shadow-sm flex items-center justify-center gap-2">
+      <div className="text-center bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-3xl p-6 mb-8 border border-white/20 dark:border-white/5 w-full">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white mb-2 drop-shadow-sm flex items-center justify-center gap-2">
           <Film size={28} className="text-primary" />
           <span>ترانيم الكورال</span>
         </h2>
-        <div className="h-1 w-16 bg-primary mx-auto rounded-full opacity-80"></div>
+        <div className="h-1.5 w-16 bg-primary mx-auto rounded-full opacity-80"></div>
       </div>
 
-      {/* Embedded Player Section */}
-      <div className="w-full bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-video relative group">
-        {currentVideoId ? (
-          <iframe 
-            src={`https://www.youtube.com/embed/${currentVideoId}?autoplay=1&rel=0`}
-            title={currentVideo.title}
-            className="w-full h-full"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-zinc-900">
-             <p className="text-zinc-500">فشل تحميل الفيديو</p>
-          </div>
-        )}
-      </div>
-
-      {/* Current Video Title Info */}
-      <div className="px-2">
-        <h3 className="text-xl font-bold text-white leading-relaxed">
-          {currentVideo.title}
-        </h3>
-        <p className="text-sm text-zinc-400 mt-1">
-          يتم العرض الآن
-        </p>
-      </div>
-
-      {/* Playlist Divider */}
-      <div className="h-px bg-white/10 w-full"></div>
-
-      {/* Video Playlist */}
-      <div className="flex flex-col gap-3">
+      {/* Grid of Thumbnails */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {videos.map((video) => {
           const videoId = getYoutubeId(video.link);
           const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : 'logo.webp';
-          const isActive = currentVideo.id === video.id;
 
           return (
             <button 
               key={video.id}
-              onClick={() => {
-                setCurrentVideo(video);
-                setIsPlaying(true);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className={`group flex flex-row items-center gap-3 p-3 rounded-2xl border transition-all duration-300 text-right w-full
-                ${isActive 
-                  ? 'bg-primary/20 border-primary/50 shadow-[0_0_15px_rgba(59,130,246,0.3)]' 
-                  : 'bg-white/10 dark:bg-black/40 border-white/10 hover:bg-white/20'
-                }
-              `}
+              onClick={() => onSelectVideo(video)}
+              className="group flex flex-col bg-white/10 dark:bg-black/40 backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
             >
-              {/* Thumbnail Container */}
-              <div className="relative w-24 h-16 sm:w-32 sm:h-20 rounded-xl overflow-hidden flex-shrink-0 bg-black/50 border border-white/5">
+              {/* Thumbnail */}
+              <div className="relative w-full aspect-video bg-black/50 overflow-hidden">
                 <img 
                   src={thumbnailUrl} 
                   alt={video.title} 
-                  className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 ${isActive ? 'scale-110 opacity-60' : 'group-hover:scale-110'}`}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
                   loading="lazy"
                 />
                 
-                {/* Playing Indicator Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  {isActive ? (
-                     <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center animate-pulse">
-                       <PlayCircle size={20} fill="currentColor" />
-                     </div>
-                  ) : (
-                     <div className="w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                       <PlayCircle size={20} />
-                     </div>
-                  )}
+                {/* Play Button Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors">
+                  <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg group-hover:scale-110 group-hover:bg-primary group-hover:border-primary transition-all duration-300">
+                    <PlayCircle className="text-white fill-white/20" size={32} />
+                  </div>
                 </div>
               </div>
 
-              {/* Text Info */}
-              <div className="flex-1">
-                <h4 className={`text-sm sm:text-base font-bold leading-snug line-clamp-2 ${isActive ? 'text-primary' : 'text-zinc-200 group-hover:text-white'}`}>
+              {/* Title */}
+              <div className="p-4 text-right w-full">
+                <h3 className="text-base font-bold text-white group-hover:text-primary transition-colors line-clamp-2 leading-relaxed">
                   {video.title}
-                </h4>
-                {isActive && <span className="text-[10px] text-primary/80 font-medium mt-1 inline-block">جاري التشغيل...</span>}
+                </h3>
               </div>
             </button>
           );

@@ -25,9 +25,9 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   const [matchCount, setMatchCount] = useState(0);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(-1);
   const [fontSize, setFontSize] = useState(24); 
-  // Updated: Default to index 1 (Amiri) instead of 0 (Cairo)
   const [fontIndex, setFontIndex] = useState(1);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [showControls, setShowControls] = useState(true);
   
   const matchRefs = useRef<(HTMLElement | null)[]>([]);
   const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -37,18 +37,15 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   const touchStartY = useRef<number | null>(null);
 
   const lines = hymn.lyrics.split('\n');
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // Load Preferences
   useEffect(() => {
-    // Load Size
     const savedSize = localStorage.getItem('hymn-font-size');
-    if (savedSize) {
-      setFontSize(parseInt(savedSize, 10));
-    }
-    // Load Font Family
+    if (savedSize) setFontSize(parseInt(savedSize, 10));
+    
     const savedFont = localStorage.getItem('hymn-font-index');
-    if (savedFont) {
-      setFontIndex(parseInt(savedFont, 10));
-    }
+    if (savedFont) setFontIndex(parseInt(savedFont, 10));
   }, []);
 
   const updateFontSize = (newSize: number) => {
@@ -61,6 +58,32 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
     const next = (fontIndex + 1) % FONTS.length;
     setFontIndex(next);
     localStorage.setItem('hymn-font-index', next.toString());
+  };
+
+  // Scroll Handler Logic
+  useEffect(() => {
+    const handleScroll = () => {
+      // Hide controls on scroll
+      setShowControls(false);
+    };
+
+    // Attach listener to appropriate container
+    const target = isFullScreen ? scrollContainerRef.current : window;
+    
+    if (target) {
+      target.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    return () => {
+      if (target) {
+        target.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [isFullScreen]);
+
+  // Click handler for text area to show controls
+  const handleContentClick = () => {
+    setShowControls(true);
   };
 
   const handleNavigation = useCallback((index: number) => {
@@ -97,18 +120,10 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
     const diffX = touchStartX.current - touchEndX;
     const diffY = touchStartY.current - touchEndY;
 
-    // Check if horizontal swipe is dominant (more horizontal than vertical movement)
     if (Math.abs(diffX) > Math.abs(diffY)) {
-       // Threshold of 50px
        if (Math.abs(diffX) > 50) {
-         // Swipe Left (diffX > 0) -> Next
-         if (diffX > 0 && canNext) {
-           onNext();
-         }
-         // Swipe Right (diffX < 0) -> Prev
-         if (diffX < 0 && canPrev) {
-           onPrev();
-         }
+         if (diffX > 0 && canNext) onNext();
+         if (diffX < 0 && canPrev) onPrev();
        }
     }
     
@@ -150,7 +165,6 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
         setCurrentMatchIndex(-1);
       }
     } catch(e) {
-      console.error(e);
       setMatchCount(0);
     }
   }, [localSearch, hymn.lyrics, handleNavigation]);
@@ -160,9 +174,7 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   };
 
   const renderLineWithHighlights = (line: string) => {
-    // Strip markdown bold markers from display text
     const cleanLine = line.replace(/^\s*\*\*/, '').replace(/\*\*\s*$/, '');
-
     const term = localSearch.trim();
     if (!term) return cleanLine;
 
@@ -197,69 +209,48 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
     matchRefs.current = Array.from(elements) as HTMLElement[];
   }, [localSearch, lines]);
 
-  // Determine line style based on content and manual tags
   const getLineInfo = (line: string) => {
     let content = line;
     let manualTag = null;
-
-    // 1. Check for Manual Tags [R], [Y], [B], [E], [P]
-    // Added 'P' to regex for Paragraph Spacer
     const tagMatch = line.match(/^\[([RYBEP])\]/);
     if (tagMatch) {
       manualTag = tagMatch[1];
-      // Remove tag from content
       content = line.substring(tagMatch[0].length).trim();
     }
-
-    // 2. Logic (Manual Tag overrides heuristics)
-    
-    // Spacer: Tag [P]
     const isSpacer = manualTag === 'P';
-
-    // English: Tag [E] or 3+ english letters
     const isEnglish = manualTag === 'E' || (manualTag === null && /[a-zA-Z]{3,}/.test(content));
-
-    // Chorus Header: Tag [R] or starts with 'القرار' etc.
     const isChorusLabel = manualTag === 'R' || (manualTag === null && /^\s*(القرار|قرار|\(ق\))/.test(content));
-    
-    // Chorus Text: Tag [Y] or starts with ** or 'القرار' in text
     const isChorusText = manualTag === 'Y' || (manualTag === null && (/^\s*\*\*/.test(content) || /^\s*القرار/.test(content)));
-    
-    // Verse: Tag [B] or starts with number
     const isVerse = manualTag === 'B' || (manualTag === null && /^\s*\(?\d+[\u0660-\u0669]?\)?[\-\.]/.test(content));
-
     return { isEnglish, isChorusLabel, isChorusText, isVerse, isSpacer, content };
   };
 
-  // Define dynamic classes for Full Screen Mode
-  // Updated: Changed z-index to z-[200] to cover Header (z-50) and Footer (z-40)
-  // Updated: Changed background to solid black in full screen to prevent transparency bleeding
   const rootClasses = isFullScreen 
     ? "fixed inset-0 z-[200] bg-black overflow-y-auto pb-20 transition-all duration-300"
     : "flex flex-col min-h-[calc(100vh-80px)] pb-64 transition-all duration-300";
 
   return (
     <div 
+      ref={scrollContainerRef}
       className={rootClasses}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
       
-      {/* Glass Sticky Controls - Visible in both modes, position adjusts */}
-      {/* Normal: top-20 (below header), FullScreen: top-4 (top of screen) */}
-      <div className={`sticky z-30 mx-4 mt-2 transition-all duration-300 ${isFullScreen ? 'top-4' : 'top-20'}`}>
+      {/* Sticky Controls Container with Fade Transition */}
+      <div 
+        className={`sticky z-30 mx-4 mt-2 transition-all duration-500 transform ${
+          showControls ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+        } ${isFullScreen ? 'top-4' : 'top-20'}`}
+      >
         <div className="max-w-3xl mx-auto bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-3xl p-3 shadow-xl">
           <div className="flex flex-col gap-2">
             
-            {/* Row 1: Title */}
             <div className="flex items-center justify-center py-2">
               <h2 className="text-2xl sm:text-3xl font-black truncate text-blue-400 drop-shadow-md tracking-wide">{hymn.title}</h2>
             </div>
 
-            {/* Row 2: Tools (Search + MatchNav + Font) */}
             <div className="flex items-center gap-2 w-full">
-              
-              {/* Flexible Search Container */}
               <div className="relative flex-1 transition-all duration-300">
                 <input
                   type="text"
@@ -271,7 +262,6 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-500 w-3.5 h-3.5" />
               </div>
               
-              {/* Match Navigation (Appears if matches > 0) */}
               {matchCount > 0 && (
                 <div className="flex items-center gap-1 animate-fade-in bg-white/30 dark:bg-black/30 rounded-lg p-0.5 border border-white/20 flex-shrink-0">
                   <span className="text-[10px] text-zinc-600 dark:text-zinc-300 w-8 text-center font-mono font-bold">
@@ -292,9 +282,7 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
                 </div>
               )}
 
-              {/* Font Controls + Full Screen Button */}
               <div className="flex items-center gap-1 bg-white/30 dark:bg-white/10 rounded-lg p-0.5 border border-white/20 flex-shrink-0">
-                {/* Font Family Switcher */}
                 <button 
                   onClick={cycleFont}
                   className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200 transition-colors border-l border-white/10 ml-0.5"
@@ -316,7 +304,6 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
                   <Plus size={14} />
                 </button>
                 
-                {/* Full Screen Toggle (Icon changes based on state) */}
                 <button 
                   onClick={() => setIsFullScreen(!isFullScreen)}
                   className="p-1.5 hover:bg-white/50 dark:hover:bg-white/20 rounded text-zinc-700 dark:text-zinc-200 transition-colors border-r border-white/10 mr-0.5"
@@ -331,46 +318,34 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
         </div>
       </div>
 
-      {/* Side Navigation Buttons (Fixed Arrows) */}
-      {/* PREV Button (Right Side for RTL context visually, or logical Previous) */}
-      {/* Note: In RTL app, 'Previous' usually means going 'Back', which is an arrow to the Right?
-          Actually, standard audio/slideshow: 
-          [ < Next ]  Content  [ Prev > ] in some RTL layouts.
-          However, let's stick to the visual arrows:
-          ChevronRight ( > ) : Usually 'Next' in LTR, 'Prev' in RTL? 
-          Let's use the same icons as the text buttons had:
-          Old Prev button used <ChevronRight />.
-          Old Next button used <ChevronLeft />.
-      */}
-      
-      {/* Right Side Button -> Previous */}
-      {canPrev && (
-        <button
-          onClick={onPrev}
-          className="fixed right-2 top-1/2 -translate-y-1/2 z-[60] p-4 rounded-full bg-black/20 hover:bg-black/50 text-white backdrop-blur-md transition-all border border-white/10 shadow-lg hover:scale-110 active:scale-95"
-          aria-label="السابق"
-        >
-          <ChevronRight size={28} />
-        </button>
-      )}
+      {/* Navigation Arrows with Fade */}
+      <div className={`transition-opacity duration-500 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        {canPrev && (
+          <button
+            onClick={onPrev}
+            className="fixed right-2 top-1/2 -translate-y-1/2 z-[60] p-4 rounded-full bg-black/20 hover:bg-black/50 text-white backdrop-blur-md transition-all border border-white/10 shadow-lg hover:scale-110 active:scale-95"
+            aria-label="السابق"
+          >
+            <ChevronRight size={28} />
+          </button>
+        )}
 
-      {/* Left Side Button -> Next */}
-      {canNext && (
-        <button
-          onClick={onNext}
-          className="fixed left-2 top-1/2 -translate-y-1/2 z-[60] p-4 rounded-full bg-black/20 hover:bg-black/50 text-white backdrop-blur-md transition-all border border-white/10 shadow-lg hover:scale-110 active:scale-95"
-          aria-label="التالي"
-        >
-          <ChevronLeft size={28} />
-        </button>
-      )}
-
+        {canNext && (
+          <button
+            onClick={onNext}
+            className="fixed left-2 top-1/2 -translate-y-1/2 z-[60] p-4 rounded-full bg-black/20 hover:bg-black/50 text-white backdrop-blur-md transition-all border border-white/10 shadow-lg hover:scale-110 active:scale-95"
+            aria-label="التالي"
+          >
+            <ChevronLeft size={28} />
+          </button>
+        )}
+      </div>
 
       {/* Lyrics Content */}
-      <div className={`flex-1 w-full max-w-3xl mx-auto p-6 ${isFullScreen ? 'pt-6' : 'mt-4'}`}>
-        
-        {/* Note: Title is removed from here in Full Screen because the Sticky Bar is now visible */}
-
+      <div 
+         className={`flex-1 w-full max-w-3xl mx-auto p-6 ${isFullScreen ? 'pt-6' : 'mt-4'}`}
+         onClick={handleContentClick} // Add click listener to show controls
+      >
         <div className={`space-y-6 text-center rounded-[32px] p-8 border shadow-lg transition-all duration-500 ${
           isFullScreen 
             ? 'bg-transparent border-transparent shadow-none' 
@@ -379,17 +354,10 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
           {lines.map((line, index) => {
              const { isEnglish, isChorusLabel, isChorusText, isVerse, isSpacer, content } = getLineInfo(line);
              
-             // Render Spacer if [P] tag found
-             if (isSpacer) {
-               return <div key={index} className="h-8 w-full" aria-hidden="true" />;
-             }
+             if (isSpacer) return <div key={index} className="h-8 w-full" aria-hidden="true" />;
+             if (!content.trim()) return <div key={index} className="h-6 w-full" aria-hidden="true" />;
 
-             // Render visible empty line for natural whitespace
-             if (!content.trim()) {
-                return <div key={index} className="h-6 w-full" aria-hidden="true" />;
-             }
-
-             let textColorClass = "text-zinc-800 dark:text-zinc-100"; // Default
+             let textColorClass = "text-zinc-800 dark:text-zinc-100";
              if (isChorusLabel) textColorClass = "text-red-500 dark:text-red-400 font-black text-xl mt-6 mb-2";
              else if (isChorusText) textColorClass = "text-amber-600 dark:text-amber-400 font-extrabold";
              else if (isVerse) textColorClass = "text-blue-600 dark:text-blue-300 font-bold mt-4";
@@ -398,7 +366,6 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
              const alignClass = isEnglish ? "text-left" : "text-center";
              const dir = isEnglish ? "ltr" : "rtl";
              
-             // Dynamic font family style
              const fontFamilyStyle = {
                 fontFamily: FONTS[fontIndex],
                 fontSize: isChorusLabel ? `${fontSize + 2}px` : `${fontSize}px`
@@ -411,7 +378,6 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
                 className={`${textColorClass} ${alignClass} leading-loose transition-[font-size] duration-200 drop-shadow-sm`}
                 style={fontFamilyStyle}
               >
-                {/* Use content (which has tags removed) instead of original line */}
                 {renderLineWithHighlights(content)}
               </p>
              );

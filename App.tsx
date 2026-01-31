@@ -7,12 +7,11 @@ import { IntroPage } from './components/IntroPage';
 import { MenuPage } from './components/MenuPage';
 import { ChoirMembers } from './components/ChoirMembers';
 import { VideoList } from './components/VideoList';
-import { PhotoGallery } from './components/PhotoGallery'; // Import PhotoGallery
+import { PhotoGallery } from './components/PhotoGallery';
 import { ScrollToTop } from './components/ScrollToTop';
-import { Hymn } from './types';
+import { Hymn, ChoirVideo } from './types';
 import { HYMNS, CHOIR_VIDEOS } from './data';
 
-// Added 'photos' to ViewState
 type ViewState = 'menu' | 'members' | 'hymns' | 'videos' | 'photos';
 
 function App() {
@@ -21,9 +20,11 @@ function App() {
   // Navigation State
   const [view, setView] = useState<ViewState>('menu');
 
-  // Hymn Data State
+  // Content State
   const [searchTerm, setSearchTerm] = useState('');
   const [currentHymn, setCurrentHymn] = useState<Hymn | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<ChoirVideo | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
 
   // Handle Browser Back Button (PopState)
   useEffect(() => {
@@ -33,26 +34,35 @@ function App() {
 
       const state = event.state;
       
+      // Reset all content states by default when popping, specific blocks will set them if needed
+      setCurrentHymn(null);
+      setSelectedVideo(null);
+      setSelectedPhoto(null);
+
       if (!state || state.view === 'menu') {
         setView('menu');
-        setCurrentHymn(null);
       } else if (state.view === 'members') {
         setView('members');
-        setCurrentHymn(null);
       } else if (state.view === 'hymns') {
         setView('hymns');
-        setCurrentHymn(null);
       } else if (state.view === 'videos') {
         setView('videos');
-        setCurrentHymn(null);
-      } else if (state.view === 'photos') { // Handle photos view back
+        // Check if we popped back to a specific video state
+        if (state.videoId) {
+           const video = CHOIR_VIDEOS.find(v => v.id === state.videoId);
+           if (video) setSelectedVideo(video);
+        }
+      } else if (state.view === 'photos') {
         setView('photos');
-        setCurrentHymn(null);
+        // Check if we popped back to a specific photo state
+        if (state.photoId) {
+           setSelectedPhoto(state.photoId);
+        }
       } else if (state.view === 'detail') {
+        // Hymn Detail
         setView('hymns');
         const hymn = HYMNS.find(h => h.id === state.hymnId);
         if (hymn) setCurrentHymn(hymn);
-        else setCurrentHymn(null); // Fallback
       }
     };
 
@@ -63,15 +73,13 @@ function App() {
   const handleEnterApp = () => {
     setShowIntro(false);
     setView('menu');
-    // Replace the current history entry (Intro) with Menu so we don't go back to Intro
+    // Replace the current history entry (Intro) with Menu
     window.history.replaceState({ view: 'menu' }, '');
   };
 
   // Back Button Logic (UI Button or Logo Click)
   const handleBack = useCallback(() => {
-    if (view === 'menu') return; // Cannot go back from menu within app logic
-    
-    // Use browser history back, which triggers the popstate listener
+    if (view === 'menu') return;
     window.history.back();
   }, [view]);
 
@@ -96,12 +104,12 @@ function App() {
     window.history.pushState({ view: 'photos' }, '');
   };
 
-  // Filter logic for the LIST view with flexible Arabic matching
+  // --- HYMNS LOGIC ---
   const filteredHymns = useMemo(() => {
     const term = searchTerm.trim();
     if (!term) return HYMNS;
 
-    // Create a flexible regex pattern for Arabic characters
+    // Flexible Arabic regex
     let pattern = '';
     for (const char of term) {
       if (['ا', 'أ', 'إ', 'آ'].includes(char)) {
@@ -109,7 +117,6 @@ function App() {
       } else if (['ي', 'ى'].includes(char)) {
         pattern += '[يى]';
       } else {
-        // Escape special regex characters
         pattern += char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       }
     }
@@ -121,7 +128,6 @@ function App() {
         regex.test(hymn.lyrics)
       );
     } catch (e) {
-      // Fallback to basic inclusion if regex fails
       const lowerTerm = term.toLowerCase();
       return HYMNS.filter(hymn => 
         hymn.title.toLowerCase().includes(lowerTerm) || 
@@ -145,7 +151,6 @@ function App() {
     if (currentIndex !== -1 && currentIndex < HYMNS.length - 1) {
       const nextHymn = HYMNS[currentIndex + 1];
       setCurrentHymn(nextHymn);
-      // Replace state instead of push to keep back button logic clean (Back goes to list)
       window.history.replaceState({ view: 'detail', hymnId: nextHymn.id }, '');
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
@@ -160,24 +165,36 @@ function App() {
     }
   };
 
-  // Determine if we are currently looking at a single hymn detail page
+  // --- VIDEOS LOGIC ---
+  const handleSelectVideo = (video: ChoirVideo | null) => {
+    setSelectedVideo(video);
+    if (video) {
+      // Push state so Back button returns to list
+      window.history.pushState({ view: 'videos', videoId: video.id }, '');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // --- PHOTOS LOGIC ---
+  const handleSelectPhoto = (photoId: number | null) => {
+    setSelectedPhoto(photoId);
+    if (photoId !== null) {
+      // Push state so Back button closes gallery modal
+      window.history.pushState({ view: 'photos', photoId: photoId }, '');
+    }
+  };
+
   const isDetailView = view === 'hymns' && currentHymn !== null;
 
   // Dynamic Background Logic
   const getBackgroundImage = () => {
     if (view === 'hymns') {
-      if (currentHymn) {
-        // Hymn Details View
-        return 'empty.webp';
-      }
-      // Hymn List View
+      if (currentHymn) return 'empty.webp';
       return 'music.webp';
     }
-    // Shared background for videos and photos
     if (view === 'videos' || view === 'photos') {
       return 'music.webp'; 
     }
-    // Default for Menu and Members
     return 'background2.webp';
   };
 
@@ -202,11 +219,22 @@ function App() {
     }
 
     if (view === 'videos') {
-      return <VideoList videos={CHOIR_VIDEOS} />;
+      return (
+        <VideoList 
+          videos={CHOIR_VIDEOS} 
+          selectedVideo={selectedVideo}
+          onSelectVideo={handleSelectVideo}
+        />
+      );
     }
 
     if (view === 'photos') {
-      return <PhotoGallery />;
+      return (
+        <PhotoGallery 
+          selectedPhoto={selectedPhoto}
+          onSelectPhoto={handleSelectPhoto}
+        />
+      );
     }
 
     if (view === 'hymns') {
@@ -215,7 +243,6 @@ function App() {
           <HymnDetail 
             key={currentHymn.id}
             hymn={currentHymn} 
-            // Removed initialSearchTerm={searchTerm}
             onBack={handleBack}
             onNext={handleNextHymn}
             onPrev={handlePrevHymn}
@@ -237,11 +264,7 @@ function App() {
 
   return (
     <div className="min-h-screen font-sans relative text-white flex flex-col">
-      
-      {/* --- GLOBAL ANIMATED BACKGROUND --- */}
-      {/* This sits behind all other content thanks to z-[-1] */}
       <div className="fixed inset-0 z-[-1] select-none pointer-events-none overflow-hidden bg-black">
-        {/* Background Image - Dynamic based on view */}
         <div className="relative w-full h-full">
           <img 
             src={getBackgroundImage()} 
@@ -249,16 +272,12 @@ function App() {
             className="w-full h-full object-cover opacity-60 transition-all duration-500" 
           />
         </div>
-        
-        {/* Dark Mode Gradient Overlay */}
         <div 
           className="absolute inset-0"
           style={{
             background: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.85) 100%)'
           }}
         />
-        
-        {/* Global Grain/Noise Texture */}
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none" 
              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} 
         />

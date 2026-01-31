@@ -257,6 +257,11 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
                return <div key={index} className="h-8 w-full" aria-hidden="true" />;
              }
 
+             // Render visible empty line for natural whitespace
+             if (!content.trim()) {
+                return <div key={index} className="h-6 w-full" aria-hidden="true" />;
+             }
+
              let textColorClass = "text-zinc-800 dark:text-zinc-100"; // Default
              if (isChorusLabel) textColorClass = "text-red-500 dark:text-red-400 font-black text-xl mt-6 mb-2";
              else if (isChorusText) textColorClass = "text-amber-600 dark:text-amber-400 font-extrabold";

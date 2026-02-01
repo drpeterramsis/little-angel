@@ -27,7 +27,7 @@ export const HymnDetail: React.FC<HymnDetailProps> = ({
   const [matchCount, setMatchCount] = useState(0);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(-1);
   const [fontSize, setFontSize] = useState(24); 
-  const [fontIndex, setFontIndex] = useState(1);
+  const [fontIndex, setFontIndex] = useState(2);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   

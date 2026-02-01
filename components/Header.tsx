@@ -1,61 +1,59 @@
 import React from 'react';
+import { ArrowRight } from 'lucide-react';
 
 interface HeaderProps {
-  onHomeClick: () => void;
-  isDark: boolean;
-  toggleTheme: () => void;
+  onBack: () => void;
+  showBack: boolean;
+  customTitle?: string | null; // Added optional custom title
 }
 
-const Header: React.FC<HeaderProps> = ({ onHomeClick, isDark, toggleTheme }) => {
+export const Header: React.FC<HeaderProps> = ({ onBack, showBack, customTitle }) => {
   return (
-    <header className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Toggle Theme Button */}
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-amber-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400"
-          aria-label={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-        >
-          {isDark ? (
-            // Sun Icon
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-          ) : (
-            // Moon Icon
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
+    // Updated: Added bg-black/30, backdrop-blur-lg, and border-b to blur content behind header
+    <header className="sticky top-0 z-50 w-full bg-black/30 backdrop-blur-lg border-b border-white/5 transition-all duration-300">
+      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+        
+        <div className="flex items-center gap-4 w-full">
+          {/* Back Button */}
+          {showBack && (
+            <button 
+              onClick={onBack}
+              className="p-3 rounded-full bg-black/20 hover:bg-black/40 text-white transition-colors backdrop-blur-md border border-white/10"
+              aria-label="رجوع"
+            >
+              <ArrowRight size={22} />
+            </button>
           )}
-        </button>
 
-        {/* Logo and Title */}
-        <button 
-          onClick={onHomeClick}
-          className="flex items-center gap-3 transition-transform active:scale-95 focus:outline-none"
-          aria-label="العودة للرئيسية"
-        >
-          <div className="text-right flex flex-col items-end">
-            <span className="text-xl md:text-2xl font-black text-blue-600 dark:text-blue-400 tracking-wider">
-              Little Angel
-            </span>
+          {/* Logo and Name Area - Aligned to end */}
+          <div 
+            className="flex items-center gap-3 select-none flex-1 justify-end" 
+          >
+            <div className="flex flex-col items-end -space-y-0.5">
+              {/* Dynamic Title: Shows customTitle if provided, otherwise defaults to Little angel */}
+              <h1 className={`font-black tracking-tight text-white font-sans drop-shadow-md transition-all duration-300 ${customTitle ? 'text-lg sm:text-xl text-amber-400' : 'text-xl'}`}>
+                {customTitle || "Little angel"}
+              </h1>
+              
+              {/* Subtitle - Hide if custom title is active to save space/reduce clutter, or keep based on preference. Keeping for now but slightly fading if custom. */}
+              <span className={`text-[11px] font-bold opacity-90 tracking-wide transition-opacity duration-300 ${customTitle ? 'text-zinc-400' : 'text-amber-400'}`}>
+                {customTitle ? "الملاك الصغير" : "حفل نغمة أجيال"}
+              </span>
+            </div>
+
+            <div className="relative w-12 h-12 rounded-full overflow-hidden border border-white/20 bg-white/5 flex items-center justify-center shadow-lg backdrop-blur-md">
+               <img 
+                src="logo.png" 
+                alt="شعار الملاك الصغير" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none'; 
+                }}
+               />
+            </div>
           </div>
-          {/* Logo with Fallback Logic */}
-          <img 
-            src="./logo.png" 
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.onerror = null; 
-              // Fallback to online image if local is missing to prevent broken icon
-              target.src = "https://play-lh.googleusercontent.com/wFjG_B6d6XfRUXMKyD1wdqLsu5G-oKDbXIDtO99Kx0yFm2YvG0QyJzXqC8X5JzZ8zQ=w240-h480-rw";
-            }}
-            alt="Little Angel Logo" 
-            className="w-12 h-12 md:w-16 md:h-16 rounded-full shadow-sm border-2 border-slate-100 dark:border-slate-700 object-cover"
-          />
-        </button>
+        </div>
       </div>
     </header>
   );
 };
-
-export default Header;

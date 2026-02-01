@@ -1,77 +1,74 @@
-# Little Angel Choir - كورال الملاك الصغير 🎵
+# Little Angel Choir App
 
-**Little Angel** is a modern, bilingual (Arabic/English) digital songbook application designed for the Little Angel choral group. It provides a seamless reading experience for hymns and spiritual songs, optimized for use during services, practices, and personal devotion.
+Application for the Little Angel Choir - Naghamat Ajyal Concert.
 
-**الملاك الصغير** هو تطبيق كتاب ترانيم رقمي ثنائي اللغة (عربي/إنجليزي) مصمم لكورال الملاك الصغير. يوفر تجربة قراءة سلسة للترانيم والأغاني الروحية، ومصمم خصيصاً للاستخدام أثناء الخدمات والتدريبات.
+## Updates
 
----
+### Version 1.0.41
+- **Metadata Fix**: 
+    - Switched from `logo.webp` to `logo.png` for all app icons and metadata images. This format is much more reliable for social media sharing (WhatsApp, Facebook, etc.).
+    - Updated `Header`, `IntroPage`, and `VideoList` components to reference `logo.png`.
+    - **Note**: You must convert your `logo.webp` to `logo.png` and add it to the project root.
 
-## ✨ Features | المميزات
+### Version 1.0.40
+- **Hymn Ordering**: 
+    - The hymn list and navigation now strictly follow the Hymn ID number. 
+    - This ensures correct sequencing (1, 2, 3...) regardless of the order in which data was entered.
 
-### 📖 Reading Experience | تجربة القراءة
--   **Bilingual Support**: Fully optimized for RTL (Arabic) and LTR (English) content.
--   **Focus Mode**: Clean interface with minimized distractions for reading lyrics.
--   **Font Resizing**: Adjustable text size (A+/A-) for better visibility on small screens or for elderly users.
--   **Smart Highlighting**: Search terms are highlighted within the lyrics to find specific verses quickly.
+### Version 1.0.39
+- **Social Sharing Metadata**: 
+    - Added Open Graph (`og:image`, `og:title`) and Favicon tags to `index.html`.
+    - Sharing the app link on social media (WhatsApp, Facebook, etc.) will now display the `logo.webp` as the preview image.
 
-### 🎨 UI/UX | واجهة المستخدم
--   **Dark/Light Mode**: Fully supported themes. "Light Mode" provides a clean paper-like look, while "Dark Mode" saves battery and reduces eye strain in low-light environments.
--   **Responsive Design**: Works perfectly on mobile phones, tablets, and desktops.
--   **Smooth Animations**: Fluid transitions between lists and reading views.
+### Version 1.0.38
+- **Photo Gallery Navigation**: 
+    - Closing an enlarged photo (via button or browser back) now reliably returns to the gallery grid without exiting the gallery section.
+    - Swiping between photos now replaces history state instead of pushing, keeping history clean.
+- **Hymn List Highlight**: 
+    - Returning to the hymn list from a hymn detail page now highlights the last viewed hymn.
+    - The highlighted hymn is automatically scrolled into view.
+    - The highlight is reset when navigating back to the main menu.
 
-### 🔍 Search & Navigation | البحث والتنقل
--   **Instant Search**: Filter hymns by title or specific lyrics content in real-time.
--   **Categories**: Hymns are tagged by category (e.g., Prayer, Choral, Feasts).
--   **Deep Linking**: (Architecture ready) for sharing specific hymns.
+### Version 1.0.37
+- **Hymn Details UI**: 
+    - Implemented dynamic header title: The main header now displays the current hymn's title when the hymn controls are hidden during scroll, effectively maximizing screen real estate while keeping context.
+- **Photo Gallery UX**: 
+    - Redesigned photo viewing experience. Instead of a popup modal, the gallery now transitions to a dedicated "Detail View" page.
+    - Detail View features a large, fit-to-screen main image area and a scrollable timeline strip of thumbnails at the bottom for easy navigation.
+    - Fixed scrolling issues ensuring the image is always fully visible.
 
----
+### Version 1.0.36
+- **Photo Gallery**: 
+    - Added swipe gesture support (Right-to-Left for Next, consistent with Arabic flow).
+    - Added navigation arrows for desktop/helper.
+    - Added photo index counter.
+- **Hymn Details**:
+    - Added Hymn Number badge to the sticky header.
+    - Reversed swipe logic: Swipe Right to go Next, Swipe Left to go Previous (Arabic Book style).
+- **Video Player**: 
+    - Optimized resolution preference to 480p to save data.
 
-## 🛠️ Tech Stack | التقنيات المستخدمة
+### Version 1.0.35
+- **Video Player**: Refactored video section to have a separate list view and player view.
+    - Browsing back from a video now returns to the list instead of the main menu.
+    - Autoplay disabled by default.
+- **Photo Gallery**: 
+    - Full-screen photo view now fits the image to the screen without scrolling.
+    - Browsing back from a photo now returns to the gallery grid.
+- **Hymn Details**:
+    - Top controls and navigation arrows now auto-hide when scrolling.
+    - Clicking the hymn text reveals the controls.
 
-*   **Framework**: [React 19](https://react.dev/) - The library for web and native user interfaces.
-*   **Styling**: [Tailwind CSS](https://tailwindcss.com/) - For rapid, utility-first styling and robust Dark Mode support.
-*   **Language**: [TypeScript](https://www.typescriptlang.org/) - For type-safe code and better maintainability.
-*   **Icons**: SVG Icons (Heroicons style).
-*   **Fonts**: [Tajawal](https://fonts.google.com/specimen/Tajawal) (Google Fonts) for modern Arabic typography.
+### Version 1.0.34
+- **Photo Gallery**: Added a new section "صور الكورال" containing 61 photos of the choir displayed in a grid with full-screen viewing capability.
+- **Embedded Video Player**: Updated the Video list to include an embedded YouTube player at the top. Clicking a video in the list now plays it directly in the app.
+- **Menu Update**: Added a new button for the photo gallery.
 
----
+### Version 1.0.33
+- **Video Section**: Added a new section "ترانيم الكورال" containing a list of YouTube videos from the choir.
+- **UI Update**: Hidden the "Choir Members" button in the main menu for this release.
+- **Navigation**: Added routing logic for the video list view.
+- **Video Components**: Added `VideoList.tsx` to handle video display with thumbnail fetching and fallback to `logo.webp`.
 
-## 🚀 Deployment | النشر
-
-This project is a **Static Web Application** and can be deployed for free on various platforms.
-
-### GitHub Pages
-1.  Push the code to a GitHub repository.
-2.  Go to **Settings** > **Pages**.
-3.  Select the branch (e.g., `main`) and folder (usually `/` or `/dist` depending on build).
-4.  Save.
-
-### Cloudflare Pages
-1.  Connect your GitHub account to Cloudflare Dashboard.
-2.  Select the repository `Little-Angel`.
-3.  Cloudflare will detect the framework.
-4.  Click **Deploy**.
-
----
-
-## 📝 Configuration | الإعدادات
-
-### Adding Hymns
-Edit the `hymns.json` file in the root directory to add new songs:
-
-```json
-{
-  "id": "unique-id",
-  "title": "Hymn Title",
-  "category": "Category Name",
-  "lyrics": [
-    "Line 1 Arabic",
-    "Line 2 English",
-    ""
-  ]
-}
-```
-
----
-
-*Built with ❤️ for the Little Angel Choir.*
+### Version 1.0.32
+- Initial Release features (Hymns, Members, Search).

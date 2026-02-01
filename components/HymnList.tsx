@@ -1,69 +1,160 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Search, ChevronLeft } from 'lucide-react';
 import { Hymn } from '../types';
 
 interface HymnListProps {
   hymns: Hymn[];
-  onSelectHymn: (id: string) => void;
   searchTerm: string;
   onSearchChange: (term: string) => void;
+  onSelectHymn: (hymn: Hymn) => void;
+  lastViewedHymnId: number | null; // Added prop
 }
 
-const HymnList: React.FC<HymnListProps> = ({ hymns, onSelectHymn, searchTerm, onSearchChange }) => {
-  const filteredHymns = hymns.filter(hymn => 
-    hymn.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    hymn.lyrics.some(line => line.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+export const HymnList: React.FC<HymnListProps> = ({ 
+  hymns, 
+  searchTerm, 
+  onSearchChange, 
+  onSelectHymn,
+  lastViewedHymnId 
+}) => {
+  
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Effect to scroll to the highlighted hymn
+  useEffect(() => {
+    if (lastViewedHymnId !== null) {
+      const element = document.getElementById(`hymn-card-${lastViewedHymnId}`);
+      if (element) {
+        // Small delay to ensure rendering
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
+    }
+  }, [lastViewedHymnId]);
+
+  const highlightText = (text: string, highlight: string) => {
+    if (!highlight.trim()) return text;
+    
+    // Build flexible Arabic regex pattern
+    let pattern = '';
+    for (const char of highlight) {
+      if (['ا', 'أ', 'إ', 'آ'].includes(char)) {
+        pattern += '[اأإآ]';
+      } else if (['ي', 'ى'].includes(char)) {
+        pattern += '[يى]';
+      } else {
+        pattern += char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+    }
+    
+    try {
+      const regex = new RegExp(`(${pattern})`, 'gi');
+      const parts = text.split(regex);
+      
+      return (
+        <>
+          {parts.map((part, i) => 
+            i % 2 === 1 ? (
+              <span key={i} className="bg-yellow-300/60 dark:bg-yellow-600/60 text-black dark:text-white rounded px-1 box-decoration-clone">
+                {part}
+              </span>
+            ) : (
+              part
+            )
+          )}
+        </>
+      );
+    } catch (e) {
+      return text;
+    }
+  };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 space-y-6">
-      {/* Search Box - Big and Clear */}
-      <div className="relative">
-        <input
-          type="text"
-          placeholder="ابحث عن ترنيمة..."
-          className="w-full p-4 pr-12 text-lg rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 shadow-sm focus:border-blue-400 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-slate-400"
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      </div>
-
-      {/* Grid of Hymns */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {filteredHymns.map((hymn) => (
-          <button
-            key={hymn.id}
-            onClick={() => onSelectHymn(hymn.id)}
-            className="group relative bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-300 text-right active:scale-98"
-          >
-            <div className="flex justify-between items-start mb-2">
-              <span className="bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 text-xs font-bold px-2 py-1 rounded-full">
-                {hymn.category || 'ترنيمة'}
-              </span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-slate-300 dark:text-slate-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors" dir="auto">
-              {hymn.title}
-            </h3>
-            {/* Updated text color for better readability in light mode */}
-            <p className="text-slate-500 dark:text-slate-400 text-sm mt-2 line-clamp-1" dir="auto">
-              {hymn.lyrics[0]}
-            </p>
-          </button>
-        ))}
-      </div>
-
-      {filteredHymns.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-xl text-slate-400">لا توجد ترانيم بهذا الاسم</p>
+    <div className="w-full max-w-3xl mx-auto p-4 pb-20">
+      
+      {/* Search Bar - Sticky under header */}
+      <div className="sticky top-20 z-40 mb-8">
+        <div className="relative group">
+          <div className="absolute inset-0 bg-white/20 dark:bg-black/20 rounded-2xl blur-md -z-10"></div>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="ابحث عن ترنيمة أو كلمات..."
+            className="w-full px-12 py-4 bg-white/30 dark:bg-black/30 backdrop-blur-xl rounded-2xl border border-white/40 dark:border-white/10 focus:border-primary/50 focus:bg-white/50 dark:focus:bg-black/50 outline-none transition-all duration-300 text-lg placeholder:text-zinc-500 dark:placeholder:text-zinc-400 text-zinc-900 dark:text-white shadow-lg"
+          />
+          <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-zinc-400 w-6 h-6 pointer-events-none" />
         </div>
-      )}
+      </div>
+
+      {/* List */}
+      <div className="flex flex-col gap-4">
+        {hymns.length === 0 ? (
+          <div className="text-center py-10">
+            <div className="bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-2xl p-8 inline-block">
+               <p className="text-lg font-medium text-zinc-600 dark:text-zinc-300">لا توجد نتائج مطابقة</p>
+            </div>
+          </div>
+        ) : (
+          hymns.map((hymn) => {
+            const isHighlighted = hymn.id === lastViewedHymnId;
+            return (
+              <div
+                key={hymn.id}
+                id={`hymn-card-${hymn.id}`} // ID for scrolling
+                onClick={() => onSelectHymn(hymn)}
+                className={`group relative bg-white/30 dark:bg-black/40 backdrop-blur-lg p-6 rounded-3xl border shadow-sm hover:shadow-xl hover:bg-white/50 dark:hover:bg-black/60 hover:scale-[1.01] cursor-pointer transition-all duration-500 ${
+                  isHighlighted 
+                    ? 'border-amber-400/80 ring-1 ring-amber-400/50 shadow-amber-500/20' 
+                    : 'border-white/40 dark:border-white/5'
+                }`}
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-4">
+                    <span className={`flex items-center justify-center w-10 h-10 rounded-full font-bold text-lg font-sans shadow-inner border border-white/20 transition-colors ${
+                       isHighlighted 
+                       ? 'bg-amber-500 text-white' 
+                       : 'bg-white/40 dark:bg-white/10 text-primary dark:text-blue-400'
+                    }`}>
+                      {hymn.id}
+                    </span>
+                    <h3 className={`text-xl font-bold transition-colors ${
+                      isHighlighted ? 'text-amber-400' : 'text-zinc-900 dark:text-zinc-100'
+                    }`}>
+                      {highlightText(hymn.title, searchTerm)}
+                    </h3>
+                  </div>
+                  <div className="p-2 rounded-full bg-white/20 dark:bg-white/5 group-hover:bg-primary/20 dark:group-hover:bg-primary/20 transition-colors">
+                     <ChevronLeft className="text-zinc-500 dark:text-zinc-400 group-hover:text-primary transition-colors" size={20} />
+                  </div>
+                </div>
+                
+                {/* Show snippet if lyrics matched */}
+                {searchTerm && (
+                   (function() {
+                      let pattern = '';
+                      for (const char of searchTerm) {
+                        if (['ا', 'أ', 'إ', 'آ'].includes(char)) pattern += '[اأإآ]';
+                        else if (['ي', 'ى'].includes(char)) pattern += '[يى]';
+                        else pattern += char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                      }
+                      const regex = new RegExp(pattern, 'i');
+                      return regex.test(hymn.lyrics);
+                   })()
+                ) && (
+                  <div className="mt-4 mr-14 p-3 rounded-xl bg-white/20 dark:bg-black/20 text-sm text-zinc-700 dark:text-zinc-300 line-clamp-2 leading-relaxed border border-white/10">
+                    {highlightText(
+                       hymn.lyrics,
+                       searchTerm
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
     </div>
   );
 };
-
-export default HymnList;

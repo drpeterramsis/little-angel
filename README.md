@@ -4,6 +4,11 @@ Application for the Little Angel Choir - Naghamat Ajyal Concert.
 
 ## Updates
 
+### Version 1.0.42
+- **UI Update**: 
+    - Reverted the `IntroPage` logo to `logo.webp` as requested.
+    - Kept `logo.png` in `index.html` for better social sharing metadata compatibility.
+
 ### Version 1.0.41
 - **Metadata Fix**: 
     - Switched from `logo.webp` to `logo.png` for all app icons and metadata images. This format is much more reliable for social media sharing (WhatsApp, Facebook, etc.).

@@ -225,7 +225,7 @@ export const HYMNS: Hymn[] = [
   },
   {
     id: 10,
-    title: "لم ترى اعين",
+    title: "لم ترى عين",
     lyrics: `
  
  لَمْ تَرَ عَيْنٌ
